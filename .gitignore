@@ -1,0 +1,100 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Machine Learning Models (large files)
+*.h5
+*.pkl
+*.joblib
+*.model
+# Keep the production model
+!backend/models/phishing_xgb.json
+
+# Datasets (large CSVs)
+*.csv
+# Keep small example datasets if needed
+!*example*.csv
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# React/Next.js build outputs
+.next/
+out/
+build/
+dist/
+
+# Logs
+logs/
+*.log
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# System files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Extension builds
+extension/build/
+extension/dist/
