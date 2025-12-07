@@ -43,11 +43,6 @@ venv.bak/
 # Keep the production model
 !backend/models/phishing_xgb.json
 
-# Datasets (large CSVs)
-*.csv
-# Keep small example datasets if needed
-!*example*.csv
-
 # Environment variables
 .env
 .env.local
