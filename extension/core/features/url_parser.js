@@ -84,10 +84,9 @@ export class URLParser {
    * @returns {boolean}
    */
   static isIPAddress(hostname) {
+    // Match Python training data exactly (data.py) - IPv4 only
     const ipv4Pattern = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
-    const ipv6Pattern = /^[0-9a-fA-F:]+$/;
-    
-    return ipv4Pattern.test(hostname) || ipv6Pattern.test(hostname);
+    return ipv4Pattern.test(hostname);
   }
   
   /**

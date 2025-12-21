@@ -59,7 +59,8 @@ export class LexicalFeatures {
    */
   static hasTLDInPath(path) {
     const pathLower = path.toLowerCase();
-    const commonTLDs = ['com', 'net', 'org', 'io', 'edu', 'gov'];
+    // Match Python training data exactly (data.py)
+    const commonTLDs = ['com', 'net', 'org'];
     return commonTLDs.some(tld => pathLower.includes(tld)) ? 1 : 0;
   }
   

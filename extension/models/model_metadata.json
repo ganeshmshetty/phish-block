@@ -17,6 +17,7 @@
   ],
   "version": "1.0.0",
   "model_type": "xgboost",
+  "recommended_threshold": 0.70,
   "trained_on": "2024-01-01",
   "performance": {
     "accuracy": 0.95,
