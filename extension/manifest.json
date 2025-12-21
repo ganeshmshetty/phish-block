@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "Phish-Block",
+  "version": "1.0.0",
+  "description": "Privacy-first phishing detection using client-side machine learning. No data leaves your browser.",
+  "author": "Phish-Block Team",
+  
+  "permissions": [
+    "storage",
+    "tabs",
+    "webNavigation",
+    "activeTab"
+  ],
+  
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  
+  "background": {
+    "service_worker": "background/service_worker.js",
+    "type": "module"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/injector.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  
+  "action": {
+    "default_popup": "ui/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    },
+    "default_title": "Phish-Block"
+  },
+  
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "ui/block_page/block.html",
+        "assets/icons/*.png",
+        "assets/styles/*.css",
+        "model_assets/*.onnx",
+        "model_assets/*.json"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  
+  "options_ui": {
+    "page": "ui/settings/settings.html",
+    "open_in_tab": true
+  },
+  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

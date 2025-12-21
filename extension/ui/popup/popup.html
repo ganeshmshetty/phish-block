@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phish-Block</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <img src="../../assets/icons/icon48.png" alt="Phish-Block" />
+        <h1>Phish-Block</h1>
+      </div>
+      <div class="toggle-container">
+        <label class="toggle">
+          <input type="checkbox" id="enabled-toggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Current Site Status -->
+    <div class="status-section">
+      <div class="status-indicator" id="status-indicator">
+        <div class="status-icon" id="status-icon">✓</div>
+        <div class="status-text">
+          <h2 id="status-title">Checking...</h2>
+          <p id="status-description">Analyzing current site</p>
+        </div>
+      </div>
+      
+      <div class="status-details" id="status-details" style="display: none;">
+        <div class="detail-row">
+          <span class="label">Confidence:</span>
+          <span class="value" id="confidence-value">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Risk Score:</span>
+          <span class="value" id="risk-score">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Response Time:</span>
+          <span class="value" id="latency">-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-section">
+      <button id="whitelist-btn" class="action-btn secondary">
+        <span class="btn-icon">✓</span>
+        Trust This Site
+      </button>
+      <button id="report-btn" class="action-btn secondary">
+        <span class="btn-icon">⚠</span>
+        Report Issue
+      </button>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-section">
+      <h3>Protection Statistics</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="stat-blocked">0</div>
+          <div class="stat-label">Blocked</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-warned">0</div>
+          <div class="stat-label">Warned</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total Checks</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <button id="settings-btn" class="footer-btn">
+        <span>⚙️</span> Settings
+      </button>
+      <button id="help-btn" class="footer-btn">
+        <span>?</span> Help
+      </button>
+    </div>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

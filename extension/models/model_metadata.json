@@ -1,0 +1,40 @@
+{
+  "feature_names": [
+    "domain_length",
+    "qty_dot_domain",
+    "qty_hyphen_domain",
+    "qty_digit_domain",
+    "domain_entropy",
+    "is_ip",
+    "path_length",
+    "qty_slash_path",
+    "qty_dot_path",
+    "qty_hyphen_path",
+    "qty_digit_path",
+    "sus_keywords_count",
+    "tld_in_path",
+    "qty_double_slash"
+  ],
+  "version": "1.0.0",
+  "model_type": "xgboost",
+  "trained_on": "2024-01-01",
+  "performance": {
+    "accuracy": 0.95,
+    "precision": 0.95,
+    "recall": 0.94,
+    "f1_score": 0.94
+  },
+  "thresholds": {
+    "default": 0.70,
+    "recommended_warn": 0.50,
+    "recommended_block": 0.70,
+    "popular_domain": 0.90
+  },
+  "description": "XGBoost binary classifier trained on phishing URL dataset. Identifies phishing attempts based on 14 URL lexical and structural features.",
+  "notes": [
+    "All features must be provided in the exact order specified in feature_names",
+    "Feature extraction must be done using the canonical extract_features module",
+    "Model performs inference entirely client-side with no external dependencies",
+    "Threshold of 0.70 achieves ~95% precision with acceptable recall"
+  ]
+}

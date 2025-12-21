@@ -1,0 +1,157 @@
+/**
+ * Model Loader
+ * Loads and initializes the ML model for client-side inference
+ */
+
+export class ModelLoader {
+  constructor() {
+    this.model = null;
+    this.metadata = null;
+    this.isLoaded = false;
+  }
+  
+  /**
+   * Load model and metadata
+   * @returns {Promise<void>}
+   */
+  async load() {
+    if (this.isLoaded) {
+      return;
+    }
+    
+    try {
+      console.log('🔄 Loading ML model...');
+      
+      // Load metadata first
+      await this.loadMetadata();
+      
+      // Load model (XGBoost JSON format)
+      await this.loadModel();
+      
+      this.isLoaded = true;
+      console.log('✅ Model loaded successfully');
+      console.log(`📊 Model version: ${this.metadata.model_version}`);
+      console.log(`🎯 Threshold: ${this.metadata.recommended_threshold}`);
+      
+    } catch (error) {
+      console.error('❌ Failed to load model:', error);
+      throw new Error(`Model loading failed: ${error.message}`);
+    }
+  }
+  
+  /**
+   * Load model metadata
+   * @private
+   */
+  async loadMetadata() {
+    const metadataUrl = chrome.runtime.getURL('model_assets/model_metadata.json');
+    const response = await fetch(metadataUrl);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch metadata: ${response.status}`);
+    }
+    
+    this.metadata = await response.json();
+    
+    // Validate metadata
+    if (!this.metadata.feature_names || !this.metadata.recommended_threshold) {
+      throw new Error('Invalid metadata format');
+    }
+  }
+  
+  /**
+   * Load XGBoost model from JSON
+   * @private
+   */
+  async loadModel() {
+    const modelUrl = chrome.runtime.getURL('model_assets/phishing_xgb.json');
+    const response = await fetch(modelUrl);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch model: ${response.status}`);
+    }
+    
+    const modelData = await response.json();
+    this.model = this.parseXGBoostModel(modelData);
+    
+    console.log(`📦 Model loaded: ${this.model.trees.length} trees`);
+  }
+  
+  /**
+   * Parse XGBoost JSON format into executable structure
+   * @private
+   * @param {Object} modelData - Raw XGBoost JSON
+   * @returns {Object} Parsed model
+   */
+  parseXGBoostModel(modelData) {
+    // XGBoost JSON structure:
+    // {learner: {gradient_booster: {model: {trees: [...], tree_info: [...]}}}}
+    
+    const learner = modelData.learner || modelData;
+    const booster = learner.gradient_booster || learner;
+    const model = booster.model || booster;
+    
+    if (!model.trees) {
+      throw new Error('Invalid XGBoost model format: missing trees');
+    }
+    
+    // Parse trees
+    const trees = model.trees.map(tree => this.parseTree(tree));
+    
+    return {
+      trees,
+      base_score: learner.learner_model_param?.base_score || 0.5,
+      num_trees: trees.length
+    };
+  }
+  
+  /**
+   * Parse individual tree from XGBoost format
+   * @private
+   * @param {Object} treeData
+   * @returns {Object}
+   */
+  parseTree(treeData) {
+    // XGBoost tree format has nodes with:
+    // - split_feature: feature index
+    // - split_condition: threshold value
+    // - left_child: left node index
+    // - right_child: right node index
+    // - leaf_value: prediction value (for leaves)
+    
+    return {
+      nodes: treeData.nodes || treeData,
+      id: treeData.id
+    };
+  }
+  
+  /**
+   * Get model information
+   * @returns {Object}
+   */
+  getInfo() {
+    return {
+      isLoaded: this.isLoaded,
+      version: this.metadata?.model_version,
+      numTrees: this.model?.num_trees,
+      numFeatures: this.metadata?.feature_names?.length,
+      threshold: this.metadata?.recommended_threshold
+    };
+  }
+  
+  /**
+   * Get feature names
+   * @returns {Array<string>}
+   */
+  getFeatureNames() {
+    return this.metadata?.feature_names || [];
+  }
+  
+  /**
+   * Get recommended threshold
+   * @returns {number}
+   */
+  getThreshold() {
+    return this.metadata?.recommended_threshold || 0.70;
+  }
+}
