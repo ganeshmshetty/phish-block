@@ -3,6 +3,8 @@
  * Manages user-trusted domains
  */
 
+import { URLParser } from '../features/url_parser.js';
+
 export class Whitelist {
   constructor() {
     this.domains = new Set();
@@ -144,17 +146,11 @@ export class Whitelist {
         url = 'http://' + url;
       }
       
-      const urlObj = new URL(url);
-      const hostname = urlObj.hostname;
+      const parsed = URLParser.parse(url);
+      if (!parsed) return null;
       
-      // Extract registered domain (domain + TLD)
-      const parts = hostname.split('.');
-      if (parts.length >= 2) {
-        // Return last two parts (domain.tld)
-        return parts.slice(-2).join('.');
-      }
-      
-      return hostname;
+      const domainInfo = URLParser.parseDomain(parsed.hostname);
+      return domainInfo.registeredDomain;
     } catch {
       return null;
     }

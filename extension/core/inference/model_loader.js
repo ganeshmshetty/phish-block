@@ -44,7 +44,7 @@ export class ModelLoader {
    * @private
    */
   async loadMetadata() {
-    const metadataUrl = chrome.runtime.getURL('model_assets/model_metadata.json');
+    const metadataUrl = chrome.runtime.getURL('models/model_metadata.json');
     const response = await fetch(metadataUrl);
     
     if (!response.ok) {
@@ -64,7 +64,7 @@ export class ModelLoader {
    * @private
    */
   async loadModel() {
-    const modelUrl = chrome.runtime.getURL('model_assets/phishing_xgb.json');
+    const modelUrl = chrome.runtime.getURL('models/phishing_xgb.json');
     const response = await fetch(modelUrl);
     
     if (!response.ok) {

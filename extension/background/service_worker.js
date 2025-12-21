@@ -130,22 +130,22 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 function updateIcon(tabId, decision) {
   const icons = {
     SAFE: {
-      path: '../assets/icons/icon-green.png',
+      path: 'assets/icons/icon-green.png',
       badgeText: '',
       badgeColor: '#2ecc71'
     },
     SUSPICIOUS: {
-      path: '../assets/icons/icon-yellow.png',
+      path: 'assets/icons/icon-yellow.png',
       badgeText: '!',
       badgeColor: '#f39c12'
     },
     PHISHING: {
-      path: '../assets/icons/icon-red.png',
+      path: 'assets/icons/icon-red.png',
       badgeText: '✕',
       badgeColor: '#e74c3c'
     },
     UNKNOWN: {
-      path: '../assets/icons/icon-grey.png',
+      path: 'assets/icons/icon-grey.png',
       badgeText: '',
       badgeColor: '#95a5a6'
     }
@@ -251,6 +251,22 @@ async function handleMessage(request, sender) {
     
     case 'clearCache':
       decisionEngine.reset();
+      return { success: true };
+
+    case 'updateSettings':
+      const { settings } = request;
+      if (settings.enabled !== undefined) {
+        await stateStore.update({ enabled: settings.enabled });
+      }
+      if (settings.thresholds) {
+        await decisionEngine.thresholds.setCustom(
+          settings.thresholds.block,
+          settings.thresholds.warn
+        );
+        // Manually update popular domain threshold
+        decisionEngine.thresholds.config.popularDomainThreshold = settings.thresholds.popularDomain;
+        await decisionEngine.thresholds.save();
+      }
       return { success: true };
     
     default:

@@ -54,8 +54,7 @@
         "ui/block_page/block.html",
         "assets/icons/*.png",
         "assets/styles/*.css",
-        "model_assets/*.onnx",
-        "model_assets/*.json"
+        "models/*.json"
       ],
       "matches": ["<all_urls>"]
     }

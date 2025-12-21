@@ -2,10 +2,6 @@
  * Settings Page Script
  */
 
-import { store } from '../../core/state/store.js';
-import { whitelistManager } from '../../core/decision/whitelist.js';
-import { decisionCache } from '../../core/decision/cache.js';
-
 // State
 let settings = null;
 let state = null;
@@ -21,11 +17,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * Load settings from storage
+ * Load settings from background script
  */
 async function loadSettings() {
-  const result = await chrome.storage.local.get('settings');
-  settings = result.settings || getDefaultSettings();
+  try {
+    const [stateResponse, statsResponse] = await Promise.all([
+      chrome.runtime.sendMessage({ action: 'getState' }),
+      chrome.runtime.sendMessage({ action: 'getStats' })
+    ]);
+
+    settings = {
+      enabled: stateResponse.enabled,
+      thresholds: {
+        block: statsResponse.thresholds.block,
+        warn: statsResponse.thresholds.warn,
+        popularDomain: statsResponse.thresholds.popularDomain
+      },
+      cache: {
+        enabled: true // Default to true as it's not togglable in backend yet
+      }
+    };
+  } catch (error) {
+    console.error('Failed to load settings:', error);
+    settings = getDefaultSettings();
+  }
 }
 
 /**
@@ -49,22 +64,36 @@ function getDefaultSettings() {
  * Load state from store
  */
 async function loadState() {
-  state = await store.getState();
+  try {
+    state = await chrome.runtime.sendMessage({ action: 'getState' });
+  } catch (error) {
+    console.error('Failed to load state:', error);
+    state = { stats: { totalChecks: 0, blocked: 0, warned: 0, allowed: 0 } };
+  }
 }
 
 /**
  * Load whitelist
  */
 async function loadWhitelist() {
-  whitelist = await whitelistManager.getAll();
+  try {
+    const response = await chrome.runtime.sendMessage({ action: 'getWhitelist' });
+    whitelist = response.whitelist || [];
+  } catch (error) {
+    console.error('Failed to load whitelist:', error);
+    whitelist = [];
+  }
 }
 
 /**
  * Update UI with current settings
  */
 function updateUI() {
+  if (!settings || !state) return;
+
   // Protection toggle
-  document.getElementById('enable-protection').checked = settings.enabled;
+  const enableProtection = document.getElementById('enable-protection');
+  if (enableProtection) enableProtection.checked = settings.enabled;
   
   // Thresholds
   updateThreshold('block', settings.thresholds.block);
@@ -72,14 +101,27 @@ function updateUI() {
   updateThreshold('popular', settings.thresholds.popularDomain);
   
   // Cache
-  document.getElementById('cache-enabled').checked = settings.cache.enabled;
+  const cacheEnabled = document.getElementById('cache-enabled');
+  if (cacheEnabled) cacheEnabled.checked = settings.cache.enabled;
   
   // Statistics
-  document.getElementById('stat-scanned').textContent = state.stats.urlsScanned.toLocaleString();
-  document.getElementById('stat-blocked').textContent = state.stats.threatsBlocked.toLocaleString();
-  document.getElementById('stat-warnings').textContent = state.stats.warningsShown.toLocaleString();
-  document.getElementById('stat-safe').textContent = 
-    (state.stats.urlsScanned - state.stats.threatsBlocked - state.stats.warningsShown).toLocaleString();
+  const stats = state.stats || {};
+  const scanned = stats.totalChecks || 0;
+  const blocked = stats.blocked || 0;
+  const warned = stats.warned || 0;
+  const safe = stats.allowed || 0;
+
+  const statScanned = document.getElementById('stat-scanned');
+  if (statScanned) statScanned.textContent = scanned.toLocaleString();
+  
+  const statBlocked = document.getElementById('stat-blocked');
+  if (statBlocked) statBlocked.textContent = blocked.toLocaleString();
+  
+  const statWarnings = document.getElementById('stat-warnings');
+  if (statWarnings) statWarnings.textContent = warned.toLocaleString();
+  
+  const statSafe = document.getElementById('stat-safe');
+  if (statSafe) statSafe.textContent = safe.toLocaleString();
   
   // Whitelist
   renderWhitelist();
@@ -92,8 +134,10 @@ function updateThreshold(type, value) {
   const slider = document.getElementById(`${type}-threshold`);
   const display = document.getElementById(`${type}-value`);
   
-  slider.value = value;
-  display.textContent = value.toFixed(2);
+  if (slider && display) {
+    slider.value = value;
+    display.textContent = value.toFixed(2);
+  }
 }
 
 /**
@@ -101,6 +145,7 @@ function updateThreshold(type, value) {
  */
 function renderWhitelist() {
   const container = document.getElementById('whitelist-list');
+  if (!container) return;
   
   if (whitelist.length === 0) {
     container.innerHTML = '<div class="empty-state">No trusted sites yet</div>';
@@ -150,13 +195,21 @@ async function addDomain(domain) {
   }
   
   // Add to whitelist
-  await whitelistManager.add(domain);
-  whitelist.push(domain);
-  
-  // Update UI
-  renderWhitelist();
-  document.getElementById('whitelist-input').value = '';
-  showMessage('Domain added to trusted sites', 'success');
+  try {
+    await chrome.runtime.sendMessage({ 
+      action: 'addToWhitelist', 
+      url: domain 
+    });
+    whitelist.push(domain);
+    
+    // Update UI
+    renderWhitelist();
+    const input = document.getElementById('whitelist-input');
+    if (input) input.value = '';
+    showMessage('Domain added to trusted sites', 'success');
+  } catch (error) {
+    showMessage('Failed to add domain', 'error');
+  }
 }
 
 /**
@@ -166,12 +219,19 @@ async function removeDomain(domain) {
   const confirmed = confirm(`Remove "${domain}" from trusted sites?`);
   
   if (confirmed) {
-    await whitelistManager.remove(domain);
-    whitelist = whitelist.filter(d => d !== domain);
-    
-    // Update UI
-    renderWhitelist();
-    showMessage('Domain removed from trusted sites', 'success');
+    try {
+      await chrome.runtime.sendMessage({ 
+        action: 'removeFromWhitelist', 
+        url: domain 
+      });
+      whitelist = whitelist.filter(d => d !== domain);
+      
+      // Update UI
+      renderWhitelist();
+      showMessage('Domain removed from trusted sites', 'success');
+    } catch (error) {
+      showMessage('Failed to remove domain', 'error');
+    }
   }
 }
 
@@ -180,11 +240,20 @@ async function removeDomain(domain) {
  */
 async function saveSettings() {
   // Update settings from UI
-  settings.enabled = document.getElementById('enable-protection').checked;
-  settings.thresholds.block = parseFloat(document.getElementById('block-threshold').value);
-  settings.thresholds.warn = parseFloat(document.getElementById('warn-threshold').value);
-  settings.thresholds.popularDomain = parseFloat(document.getElementById('popular-threshold').value);
-  settings.cache.enabled = document.getElementById('cache-enabled').checked;
+  const enableProtection = document.getElementById('enable-protection');
+  if (enableProtection) settings.enabled = enableProtection.checked;
+  
+  const blockThreshold = document.getElementById('block-threshold');
+  if (blockThreshold) settings.thresholds.block = parseFloat(blockThreshold.value);
+  
+  const warnThreshold = document.getElementById('warn-threshold');
+  if (warnThreshold) settings.thresholds.warn = parseFloat(warnThreshold.value);
+  
+  const popularThreshold = document.getElementById('popular-threshold');
+  if (popularThreshold) settings.thresholds.popularDomain = parseFloat(popularThreshold.value);
+  
+  const cacheEnabled = document.getElementById('cache-enabled');
+  if (cacheEnabled) settings.cache.enabled = cacheEnabled.checked;
   
   // Validate thresholds
   if (settings.thresholds.warn >= settings.thresholds.block) {
@@ -192,16 +261,17 @@ async function saveSettings() {
     return;
   }
   
-  // Save to storage
-  await chrome.storage.local.set({ settings });
-  
   // Notify background script
-  chrome.runtime.sendMessage({
-    action: 'settingsUpdated',
-    settings
-  }).catch(() => {});
-  
-  showMessage('Settings saved successfully', 'success');
+  try {
+    await chrome.runtime.sendMessage({
+      action: 'updateSettings',
+      settings
+    });
+    
+    showMessage('Settings saved successfully', 'success');
+  } catch (error) {
+    showMessage('Failed to save settings', 'error');
+  }
 }
 
 /**
@@ -218,10 +288,14 @@ async function resetStats() {
   );
   
   if (confirmed) {
-    await store.resetStats();
-    state = await store.getState();
-    updateUI();
-    showMessage('Statistics reset successfully', 'success');
+    try {
+      await chrome.runtime.sendMessage({ action: 'resetStats' });
+      await loadState(); // Reload state
+      updateUI();
+      showMessage('Statistics reset successfully', 'success');
+    } catch (error) {
+      showMessage('Failed to reset statistics', 'error');
+    }
   }
 }
 
@@ -229,8 +303,12 @@ async function resetStats() {
  * Clear cache
  */
 async function clearCache() {
-  decisionCache.clear();
-  showMessage('Cache cleared successfully', 'success');
+  try {
+    await chrome.runtime.sendMessage({ action: 'clearCache' });
+    showMessage('Cache cleared successfully', 'success');
+  } catch (error) {
+    showMessage('Failed to clear cache', 'error');
+  }
 }
 
 /**
@@ -238,13 +316,15 @@ async function clearCache() {
  */
 function showMessage(message, type = 'success') {
   const statusElement = document.getElementById('save-status');
-  statusElement.textContent = message;
-  statusElement.className = `save-status ${type}`;
-  statusElement.style.display = 'block';
-  
-  setTimeout(() => {
-    statusElement.style.display = 'none';
-  }, 3000);
+  if (statusElement) {
+    statusElement.textContent = message;
+    statusElement.className = `save-status ${type}`;
+    statusElement.style.display = 'block';
+    
+    setTimeout(() => {
+      statusElement.style.display = 'none';
+    }, 3000);
+  }
 }
 
 /**
@@ -256,42 +336,62 @@ function setupEventListeners() {
     const slider = document.getElementById(`${type}-threshold`);
     const display = document.getElementById(`${type}-value`);
     
-    slider.addEventListener('input', (e) => {
-      display.textContent = parseFloat(e.target.value).toFixed(2);
-    });
-  });
-  
-  // Whitelist
-  document.getElementById('add-whitelist-btn').addEventListener('click', async () => {
-    const input = document.getElementById('whitelist-input');
-    await addDomain(input.value);
-  });
-  
-  document.getElementById('whitelist-input').addEventListener('keypress', async (e) => {
-    if (e.key === 'Enter') {
-      await addDomain(e.target.value);
+    if (slider && display) {
+      slider.addEventListener('input', (e) => {
+        display.textContent = parseFloat(e.target.value).toFixed(2);
+      });
     }
   });
   
+  // Whitelist
+  const addBtn = document.getElementById('add-whitelist-btn');
+  if (addBtn) {
+    addBtn.addEventListener('click', async () => {
+      const input = document.getElementById('whitelist-input');
+      if (input) await addDomain(input.value);
+    });
+  }
+  
+  const whitelistInput = document.getElementById('whitelist-input');
+  if (whitelistInput) {
+    whitelistInput.addEventListener('keypress', async (e) => {
+      if (e.key === 'Enter') {
+        await addDomain(e.target.value);
+      }
+    });
+  }
+  
   // Statistics
-  document.getElementById('reset-stats-btn').addEventListener('click', resetStats);
+  const resetBtn = document.getElementById('reset-stats-btn');
+  if (resetBtn) resetBtn.addEventListener('click', resetStats);
   
   // Cache
-  document.getElementById('clear-cache-btn').addEventListener('click', clearCache);
+  const clearCacheBtn = document.getElementById('clear-cache-btn');
+  if (clearCacheBtn) clearCacheBtn.addEventListener('click', clearCache);
   
   // Save settings
-  document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+  const saveBtn = document.getElementById('save-settings-btn');
+  if (saveBtn) saveBtn.addEventListener('click', saveSettings);
   
   // External links
-  document.getElementById('github-btn').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://github.com/ganeshmshetty/phish-block' });
-  });
+  const githubBtn = document.getElementById('github-btn');
+  if (githubBtn) {
+    githubBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://github.com/ganeshmshetty/phish-block' });
+    });
+  }
   
-  document.getElementById('docs-btn').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://github.com/ganeshmshetty/phish-block#readme' });
-  });
+  const docsBtn = document.getElementById('docs-btn');
+  if (docsBtn) {
+    docsBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://github.com/ganeshmshetty/phish-block#readme' });
+    });
+  }
   
-  document.getElementById('report-issue-btn').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://github.com/ganeshmshetty/phish-block/issues/new' });
-  });
+  const reportBtn = document.getElementById('report-issue-btn');
+  if (reportBtn) {
+    reportBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://github.com/ganeshmshetty/phish-block/issues/new' });
+    });
+  }
 }
