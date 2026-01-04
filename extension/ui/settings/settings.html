@@ -8,205 +8,178 @@
 </head>
 <body>
   <div class="settings-container">
-    <header class="header">
+    <!-- Sidebar -->
+    <div class="sidebar">
       <div class="logo">
-        <img src="../../assets/icons/icon48.png" alt="Phish-Block">
-        <h1>Phish-Block Settings</h1>
+        <img src="../../assets/icons/icon48.png" alt="Phish-Block" />
+        <h2>Phish-Block</h2>
       </div>
-    </header>
-    
-    <div class="content">
-      <!-- Protection Settings -->
-      <section class="section">
-        <h2>🛡️ Protection Settings</h2>
-        
-        <div class="setting-item">
-          <div class="setting-info">
-            <label for="enable-protection">Enable Protection</label>
-            <p class="description">
-              Scan all URLs and block phishing attempts in real-time
-            </p>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" id="enable-protection" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-        
-        <div class="setting-item">
-          <div class="setting-info">
-            <label for="block-threshold">Block Threshold</label>
-            <p class="description">
-              Risk score above which sites are blocked (recommended: 0.70)
-            </p>
-          </div>
-          <div class="threshold-control">
-            <input type="range" id="block-threshold" min="0.5" max="0.95" step="0.05" value="0.70">
-            <span class="threshold-value" id="block-value">0.70</span>
-          </div>
-        </div>
-        
-        <div class="setting-item">
-          <div class="setting-info">
-            <label for="warn-threshold">Warning Threshold</label>
-            <p class="description">
-              Risk score above which warnings are shown (recommended: 0.50)
-            </p>
-          </div>
-          <div class="threshold-control">
-            <input type="range" id="warn-threshold" min="0.3" max="0.7" step="0.05" value="0.50">
-            <span class="threshold-value" id="warn-value">0.50</span>
-          </div>
-        </div>
-        
-        <div class="setting-item">
-          <div class="setting-info">
-            <label for="popular-threshold">Popular Domain Threshold</label>
-            <p class="description">
-              Higher threshold for well-known domains (recommended: 0.90)
-            </p>
-          </div>
-          <div class="threshold-control">
-            <input type="range" id="popular-threshold" min="0.7" max="0.98" step="0.02" value="0.90">
-            <span class="threshold-value" id="popular-value">0.90</span>
-          </div>
-        </div>
-      </section>
-      
-      <!-- Whitelist Management -->
-      <section class="section">
-        <h2>✓ Trusted Sites</h2>
-        <p class="section-description">
-          Sites you've marked as trusted will never be blocked
-        </p>
-        
-        <div class="whitelist-controls">
-          <input type="text" id="whitelist-input" placeholder="Enter domain (e.g., example.com)">
-          <button id="add-whitelist-btn" class="btn primary">Add</button>
-        </div>
-        
-        <div class="whitelist-list" id="whitelist-list">
-          <div class="empty-state">No trusted sites yet</div>
-        </div>
-      </section>
-      
-      <!-- Statistics -->
-      <section class="section">
-        <h2>📊 Statistics</h2>
-        
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">🛡️</div>
-            <div class="stat-value" id="stat-scanned">0</div>
-            <div class="stat-label">Sites Scanned</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">🚫</div>
-            <div class="stat-value" id="stat-blocked">0</div>
-            <div class="stat-label">Threats Blocked</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">⚠️</div>
-            <div class="stat-value" id="stat-warnings">0</div>
-            <div class="stat-label">Warnings Shown</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">✓</div>
-            <div class="stat-value" id="stat-safe">0</div>
-            <div class="stat-label">Safe Sites</div>
-          </div>
-        </div>
-        
-        <div class="stats-actions">
-          <button id="reset-stats-btn" class="btn secondary">Reset Statistics</button>
-        </div>
-      </section>
-      
-      <!-- Advanced Settings -->
-      <section class="section">
-        <h2>⚙️ Advanced Settings</h2>
-        
-        <div class="setting-item">
-          <div class="setting-info">
-            <label for="cache-enabled">Enable Decision Cache</label>
-            <p class="description">
-              Cache decisions for faster repeat visits (1 hour TTL)
-            </p>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" id="cache-enabled" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-        
-        <div class="setting-item">
-          <div class="setting-info">
-            <label>Clear Decision Cache</label>
-            <p class="description">
-              Remove all cached decisions (may slow down repeat visits temporarily)
-            </p>
-          </div>
-          <button id="clear-cache-btn" class="btn secondary small">Clear Cache</button>
-        </div>
-      </section>
-      
-      <!-- Privacy & Data -->
-      <section class="section">
-        <h2>🔒 Privacy & Data</h2>
-        
-        <div class="privacy-info">
-          <div class="info-card success">
-            <span class="card-icon">✓</span>
-            <div class="card-content">
-              <strong>100% Client-Side Processing</strong>
-              <p>All URL analysis happens in your browser. No data is sent to external servers.</p>
-            </div>
-          </div>
-          
-          <div class="info-card success">
-            <span class="card-icon">✓</span>
-            <div class="card-content">
-              <strong>Zero Data Collection</strong>
-              <p>We don't collect, store, or transmit your browsing history or personal information.</p>
-            </div>
-          </div>
-          
-          <div class="info-card success">
-            <span class="card-icon">✓</span>
-            <div class="card-content">
-              <strong>Open Source</strong>
-              <p>Our code is publicly available for audit and verification.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <!-- About -->
-      <section class="section">
-        <h2>ℹ️ About</h2>
-        
-        <div class="about-info">
-          <p><strong>Phish-Block</strong> v1.0.0</p>
-          <p>Privacy-first phishing detection using machine learning</p>
-          
-          <div class="about-links">
-            <button id="github-btn" class="link-btn">GitHub Repository</button>
-            <button id="docs-btn" class="link-btn">Documentation</button>
-            <button id="report-issue-btn" class="link-btn">Report Issue</button>
-          </div>
-        </div>
-      </section>
+      <nav class="nav-menu">
+        <a href="#general" class="nav-item active" data-tab="general">
+          <span class="icon">⚙️</span> General
+        </a>
+        <a href="#sensitivity" class="nav-item" data-tab="sensitivity">
+          <span class="icon">🛡️</span> Sensitivity
+        </a>
+        <a href="#whitelist" class="nav-item" data-tab="whitelist">
+          <span class="icon">✓</span> Whitelist
+        </a>
+        <a href="#about" class="nav-item" data-tab="about">
+          <span class="icon">ℹ️</span> About
+        </a>
+      </nav>
+      <div class="version">v1.0.0</div>
     </div>
-    
-    <footer class="footer">
-      <button id="save-settings-btn" class="btn primary large">Save Settings</button>
-      <p class="save-status" id="save-status"></p>
-    </footer>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- General Settings -->
+      <div id="general" class="tab-content active">
+        <h1>General Settings</h1>
+        
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Phishing Protection</h3>
+              <p>Enable or disable real-time phishing detection</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="enable-protection" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Statistics</h3>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-value" id="total-scans">0</div>
+              <div class="stat-label">URLs Scanned</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="total-blocks">0</div>
+              <div class="stat-label">Threats Blocked</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="cache-hit-rate">0%</div>
+              <div class="stat-label">Cache Efficiency</div>
+            </div>
+          </div>
+          <div class="actions-row">
+            <button id="reset-stats-btn" class="btn secondary">Reset Statistics</button>
+            <button id="clear-cache-btn" class="btn secondary">Clear Cache</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sensitivity Settings -->
+      <div id="sensitivity" class="tab-content">
+        <h1>Detection Sensitivity</h1>
+        
+        <div class="card">
+          <div class="profile-selector">
+            <div class="profile-option" data-profile="conservative">
+              <div class="profile-header">
+                <div class="radio-circle"></div>
+                <h3>Relaxed</h3>
+              </div>
+              <p>Fewer false positives. Only blocks high-confidence threats.</p>
+              <div class="threshold-badge">Threshold: 85%</div>
+            </div>
+            
+            <div class="profile-option active" data-profile="balanced">
+              <div class="profile-header">
+                <div class="radio-circle"></div>
+                <h3>Balanced (Recommended)</h3>
+              </div>
+              <p>Optimal balance between security and convenience.</p>
+              <div class="threshold-badge">Threshold: 70%</div>
+            </div>
+            
+            <div class="profile-option" data-profile="aggressive">
+              <div class="profile-header">
+                <div class="radio-circle"></div>
+                <h3>Paranoid</h3>
+              </div>
+              <p>Maximum security. May block some legitimate sites.</p>
+              <div class="threshold-badge">Threshold: 50%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Advanced Thresholds</h3>
+          <p class="description">Manually configure detection thresholds (0.0 - 1.0)</p>
+          
+          <div class="input-group">
+            <label>Block Threshold</label>
+            <div class="range-container">
+              <input type="range" id="block-threshold-slider" min="0" max="100" value="70">
+              <span id="block-threshold-value">0.70</span>
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label>Warning Threshold</label>
+            <div class="range-container">
+              <input type="range" id="warn-threshold-slider" min="0" max="100" value="50">
+              <span id="warn-threshold-value">0.50</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Whitelist Settings -->
+      <div id="whitelist" class="tab-content">
+        <h1>Trusted Sites</h1>
+        <p class="description">These domains will never be blocked.</p>
+        
+        <div class="card">
+          <div class="add-domain-row">
+            <input type="text" id="new-domain" placeholder="example.com">
+            <button id="add-domain-btn" class="btn primary">Add Domain</button>
+          </div>
+          
+          <div class="whitelist-container">
+            <ul id="whitelist-list">
+              <!-- Populated by JS -->
+            </ul>
+            <div id="empty-whitelist" class="empty-state">
+              No trusted domains yet
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div id="about" class="tab-content">
+        <h1>About Phish-Block</h1>
+        
+        <div class="card">
+          <div class="about-header">
+            <img src="../../assets/icons/icon128.png" alt="Logo" class="about-logo">
+            <div>
+              <h3>Phish-Block</h3>
+              <p>Version 1.0.0</p>
+            </div>
+          </div>
+          
+          <p>
+            Phish-Block uses advanced machine learning to detect and block phishing websites 
+            in real-time, directly in your browser. No data is sent to external servers.
+          </p>
+          
+          <div class="links-list">
+            <a href="https://github.com/ganeshmshetty/phish-block" target="_blank">GitHub Repository</a>
+            <a href="#" id="report-issue-link">Report an Issue</a>
+            <a href="#" id="privacy-policy-link">Privacy Policy</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  
+
   <script src="settings.js" type="module"></script>
 </body>
 </html>

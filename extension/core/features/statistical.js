@@ -7,6 +7,7 @@ export class StatisticalFeatures {
   /**
    * Calculate Shannon entropy of a string
    * Measures randomness/predictability
+   * MUST MATCH Python implementation: iterate over 256 possible byte values (0-255)
    * 
    * @param {string} text - Text to analyze
    * @returns {number} Entropy value (typically 0-8)
@@ -16,26 +17,28 @@ export class StatisticalFeatures {
       return 0.0;
     }
     
-    // Count character frequencies
-    const freq = {};
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-      freq[char] = (freq[char] || 0) + 1;
-    }
-    
-    // Calculate entropy
     let entropy = 0.0;
     const len = text.length;
     
-    for (const char in freq) {
-      const p = freq[char] / len;
-      if (p > 0) {
-        entropy += -p * Math.log2(p);
+    // Iterate over all 256 possible byte values (0-255) to match Python implementation
+    for (let x = 0; x < 256; x++) {
+      const char = String.fromCharCode(x);
+      let count = 0;
+      
+      // Count occurrences of this character
+      for (let i = 0; i < text.length; i++) {
+        if (text[i] === char) {
+          count++;
+        }
+      }
+      
+      const p_x = count / len;
+      if (p_x > 0) {
+        entropy += -p_x * Math.log2(p_x);
       }
     }
     
-    // Round to 4 decimal places
-    return Math.round(entropy * 10000) / 10000;
+    return entropy;
   }
   
   /**

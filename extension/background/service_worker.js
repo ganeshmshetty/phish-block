@@ -245,6 +245,13 @@ async function handleMessage(request, sender) {
     case 'getStats':
       return decisionEngine.getStats();
     
+    case 'getSettings':
+      return {
+        enabled: stateStore.get().enabled,
+        thresholds: decisionEngine.thresholds.config,
+        whitelist: Array.from(decisionEngine.whitelist.domains)
+      };
+    
     case 'resetStats':
       await stateStore.resetStats();
       return { success: true };
@@ -279,6 +286,11 @@ async function handleMessage(request, sender) {
  */
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
+    // Ensure initialized
+    if (!isReady || !stateStore) {
+      return;
+    }
+    
     // Update current tab info for popup
     const state = stateStore.get();
     if (state.currentTab.url === tab.url) {
@@ -292,6 +304,11 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
  * Handle tab activation
  */
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  // Ensure initialized
+  if (!isReady || !stateStore) {
+    return;
+  }
+  
   const tab = await chrome.tabs.get(activeInfo.tabId);
   if (tab.url && isReady) {
     const state = stateStore.get();

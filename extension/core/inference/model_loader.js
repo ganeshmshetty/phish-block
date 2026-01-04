@@ -30,7 +30,8 @@ export class ModelLoader {
       
       this.isLoaded = true;
       console.log('✅ Model loaded successfully');
-      console.log(`📊 Model version: ${this.metadata.model_version}`);
+      console.log(`📊 Model version: ${this.metadata.version}`);
+      console.log(`📦 Features: ${this.metadata.feature_names.length}`);
       console.log(`🎯 Threshold: ${this.metadata.recommended_threshold}`);
       
     } catch (error) {
@@ -112,17 +113,15 @@ export class ModelLoader {
    * @returns {Object}
    */
   parseTree(treeData) {
-    // XGBoost tree format has nodes with:
-    // - split_feature: feature index
-    // - split_condition: threshold value
-    // - left_child: left node index
-    // - right_child: right node index
-    // - leaf_value: prediction value (for leaves)
+    // Modern XGBoost uses array-based format:
+    // - left_children: array of left child indices
+    // - right_children: array of right child indices
+    // - split_indices: feature indices for splits
+    // - split_conditions: threshold values for splits
+    // - base_weights: leaf values
     
-    return {
-      nodes: treeData.nodes || treeData,
-      id: treeData.id
-    };
+    // Return the tree data as-is (it's already in the correct format)
+    return treeData;
   }
   
   /**
@@ -132,10 +131,11 @@ export class ModelLoader {
   getInfo() {
     return {
       isLoaded: this.isLoaded,
-      version: this.metadata?.model_version,
+      version: this.metadata?.version,
       numTrees: this.model?.num_trees,
       numFeatures: this.metadata?.feature_names?.length,
-      threshold: this.metadata?.recommended_threshold
+      threshold: this.metadata?.recommended_threshold,
+      featureNames: this.metadata?.feature_names
     };
   }
   

@@ -3,22 +3,18 @@
     "domain_length",
     "qty_dot_domain",
     "qty_hyphen_domain",
-    "qty_digit_domain",
     "domain_entropy",
     "is_ip",
     "path_length",
     "qty_slash_path",
-    "qty_dot_path",
     "qty_hyphen_path",
-    "qty_digit_path",
     "sus_keywords_count",
-    "tld_in_path",
     "qty_double_slash"
   ],
-  "version": "1.0.0",
+  "version": "2.0.0",
   "model_type": "xgboost",
   "recommended_threshold": 0.70,
-  "trained_on": "2024-01-01",
+  "trained_on": "2026-01-04",
   "performance": {
     "accuracy": 0.95,
     "precision": 0.95,
@@ -31,11 +27,12 @@
     "recommended_block": 0.70,
     "popular_domain": 0.90
   },
-  "description": "XGBoost binary classifier trained on phishing URL dataset. Identifies phishing attempts based on 14 URL lexical and structural features.",
+  "description": "XGBoost binary classifier (150 trees) trained on master phishing URL dataset. Identifies phishing attempts based on 10 URL lexical and structural features.",
   "notes": [
     "All features must be provided in the exact order specified in feature_names",
-    "Feature extraction must be done using the canonical extract_features module",
+    "Feature extraction must match the Colab training notebook (Untitled2.ipynb)",
     "Model performs inference entirely client-side with no external dependencies",
+    "Entropy calculation must iterate over 256 possible byte values to match Python implementation",
     "Threshold of 0.70 achieves ~95% precision with acceptable recall"
   ]
 }
