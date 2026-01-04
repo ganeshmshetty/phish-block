@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Phish-Block Feature Extraction Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+    .test-case { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+    .pass { background: #d4edda; }
+    .fail { background: #f8d7da; }
+    pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    input { width: 100%; padding: 8px; margin: 10px 0; }
+    button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Phish-Block Feature Extraction Test</h1>
+  
+  <h2>Manual Test</h2>
+  <input type="text" id="urlInput" placeholder="Enter URL to test..." value="https://google.com">
+  <button onclick="testURL()">Test URL</button>
+  <pre id="result"></pre>
+  
+  <h2>Automated Tests</h2>
+  <div id="tests"></div>
+  
+  <script type="module">
+    // Import feature extraction modules
+    import { URLParser } from '../core/features/url_parser.js';
+    import { LexicalFeatures } from '../core/features/lexical_features.js';
+    import { StatisticalFeatures } from '../core/features/statistical.js';
+    import { FeatureExtractor, FEATURE_NAMES } from '../core/features/index.js';
+    
+    // Make functions available globally for testing
+    window.URLParser = URLParser;
+    window.LexicalFeatures = LexicalFeatures;
+    window.StatisticalFeatures = StatisticalFeatures;
+    window.FeatureExtractor = FeatureExtractor;
+    window.FEATURE_NAMES = FEATURE_NAMES;
+    
+    // Test function
+    window.testURL = function() {
+      const url = document.getElementById('urlInput').value;
+      const features = FeatureExtractor.extractFeatures(url);
+      const featureArray = FeatureExtractor.featuresToArray(features);
+      
+      document.getElementById('result').textContent = JSON.stringify({
+        url,
+        features,
+        featureArray,
+        featureNames: FEATURE_NAMES
+      }, null, 2);
+    };
+    
+    // Run automated tests
+    const tests = [
+      {
+        name: 'countChar - dots in domain',
+        test: () => {
+          const count = LexicalFeatures.countChar('mail.google.com', '.');
+          return count === 2 ? 'PASS' : `FAIL: expected 2, got ${count}`;
+        }
+      },
+      {
+        name: 'countChar - hyphens in domain',
+        test: () => {
+          const count = LexicalFeatures.countChar('my-test-site.com', '-');
+          return count === 2 ? 'PASS' : `FAIL: expected 2, got ${count}`;
+        }
+      },
+      {
+        name: 'countChar - slashes in path',
+        test: () => {
+          const count = LexicalFeatures.countChar('/path/to/page/', '/');
+          return count === 4 ? 'PASS' : `FAIL: expected 4, got ${count}`;
+        }
+      },
+      {
+        name: 'calculateEntropy - empty string',
+        test: () => {
+          const entropy = StatisticalFeatures.calculateEntropy('');
+          return entropy === 0 ? 'PASS' : `FAIL: expected 0, got ${entropy}`;
+        }
+      },
+      {
+        name: 'calculateEntropy - normal domain',
+        test: () => {
+          const entropy = StatisticalFeatures.calculateEntropy('google.com');
+          return entropy > 2 && entropy < 4 ? 'PASS' : `FAIL: got ${entropy}`;
+        }
+      },
+      {
+        name: 'Feature extraction - google.com',
+        test: () => {
+          const features = FeatureExtractor.extractFeatures('https://google.com');
+          if (!features) return 'FAIL: features is null';
+          if (features.domain_length !== 10) return `FAIL: domain_length expected 10, got ${features.domain_length}`;
+          if (features.qty_dot_domain !== 1) return `FAIL: qty_dot_domain expected 1, got ${features.qty_dot_domain}`;
+          if (features.is_ip !== 0) return `FAIL: is_ip expected 0, got ${features.is_ip}`;
+          return 'PASS';
+        }
+      },
+      {
+        name: 'Feature extraction - IP address',
+        test: () => {
+          const features = FeatureExtractor.extractFeatures('http://192.168.1.1/login');
+          if (!features) return 'FAIL: features is null';
+          if (features.is_ip !== 1) return `FAIL: is_ip expected 1, got ${features.is_ip}`;
+          return 'PASS';
+        }
+      },
+      {
+        name: 'Feature extraction - suspicious URL',
+        test: () => {
+          const features = FeatureExtractor.extractFeatures('http://login-verify-account.com/secure/banking');
+          if (!features) return 'FAIL: features is null';
+          if (features.sus_keywords_count < 3) return `FAIL: sus_keywords_count expected >= 3, got ${features.sus_keywords_count}`;
+          if (features.qty_hyphen_domain < 2) return `FAIL: qty_hyphen_domain expected >= 2, got ${features.qty_hyphen_domain}`;
+          return 'PASS';
+        }
+      },
+      {
+        name: 'Feature array order matches FEATURE_NAMES',
+        test: () => {
+          const features = FeatureExtractor.extractFeatures('https://example.com/test');
+          const featureArray = FeatureExtractor.featuresToArray(features);
+          if (featureArray.length !== FEATURE_NAMES.length) {
+            return `FAIL: array length ${featureArray.length} !== ${FEATURE_NAMES.length}`;
+          }
+          // Check domain_length is first
+          if (featureArray[0] !== features.domain_length) {
+            return `FAIL: first feature should be domain_length`;
+          }
+          return 'PASS';
+        }
+      }
+    ];
+    
+    const testsDiv = document.getElementById('tests');
+    tests.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'test-case';
+      try {
+        const result = t.test();
+        div.className += result === 'PASS' ? ' pass' : ' fail';
+        div.innerHTML = `<strong>${t.name}</strong>: ${result}`;
+      } catch (e) {
+        div.className += ' fail';
+        div.innerHTML = `<strong>${t.name}</strong>: ERROR - ${e.message}`;
+      }
+      testsDiv.appendChild(div);
+    });
+    
+    // Run initial test
+    testURL();
+  </script>
+</body>
+</html>

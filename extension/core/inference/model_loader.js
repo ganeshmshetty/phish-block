@@ -99,9 +99,26 @@ export class ModelLoader {
     // Parse trees
     const trees = model.trees.map(tree => this.parseTree(tree));
     
+    // Parse base_score - XGBoost stores it as "[3.3873945E-1]" string format
+    let baseScore = 0.5;
+    const baseScoreRaw = learner.learner_model_param?.base_score;
+    if (baseScoreRaw) {
+      if (typeof baseScoreRaw === 'string') {
+        // Handle "[3.3873945E-1]" format
+        const match = baseScoreRaw.match(/\[?([\d.eE+-]+)\]?/);
+        if (match) {
+          baseScore = parseFloat(match[1]);
+        }
+      } else if (typeof baseScoreRaw === 'number') {
+        baseScore = baseScoreRaw;
+      }
+    }
+    
+    console.log('📊 Base score parsed:', baseScore);
+    
     return {
       trees,
-      base_score: learner.learner_model_param?.base_score || 0.5,
+      base_score: baseScore,
       num_trees: trees.length
     };
   }

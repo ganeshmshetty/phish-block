@@ -25,26 +25,23 @@ export class Predictor {
     
     const model = this.modelLoader.model;
     
-    console.log('🔍 Prediction Debug:');
-    console.log('  Features:', features);
-    console.log('  Base score:', model.base_score);
-    console.log('  Number of trees:', model.trees.length);
-    
     // Get predictions from all trees
+    // XGBoost base_score is already in log-odds space for binary:logistic
     let score = model.base_score;
     
     for (let i = 0; i < model.trees.length; i++) {
       const treeScore = this.predictTree(model.trees[i], features);
-      console.log(`  Tree ${i} contribution:`, treeScore);
       score += treeScore;
     }
-    
-    console.log('  Final raw score:', score);
     
     // Convert to probability using sigmoid function
     const probability = 1.0 / (1.0 + Math.exp(-score));
     
-    console.log('  Probability:', probability);
+    console.log('🔍 Prediction:', { 
+      features: features.slice(0, 5).map(f => f.toFixed(2)), 
+      score: score.toFixed(4), 
+      probability: probability.toFixed(4) 
+    });
     
     return Math.round(probability * 10000) / 10000; // Round to 4 decimals
   }

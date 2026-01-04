@@ -11,7 +11,9 @@ export class LexicalFeatures {
    * @returns {number} Count
    */
   static countChar(text, char) {
-    return (text.match(new RegExp(`\\${char}`, 'g')) || []).length;
+    // Escape special regex characters: . * + ? ^ $ { } [ ] \ | ( )
+    const escapedChar = char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return (text.match(new RegExp(escapedChar, 'g')) || []).length;
   }
   
   /**
