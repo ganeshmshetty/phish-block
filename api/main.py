@@ -17,6 +17,7 @@ import os
 import json
 from functools import lru_cache
 import logging
+import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -112,7 +113,82 @@ def load_model():
 @app.on_event("startup")
 async def startup_event():
     """Load model when server starts."""
+    # Ensure model exists locally; if not, try to download from MODEL_URL
+    try:
+        await ensure_model_available()
+    except Exception as e:
+        logger.warning(f"Model ensure step failed: {e}")
     load_model()
+
+
+async def ensure_model_available():
+    """Ensure model file exists locally; download if MODEL_URL is provided."""
+    # Check existing possible paths first
+    possible_paths = [
+        os.path.join(os.path.dirname(__file__), '..', 'ml_research', 'models', 'phishing_xgb.json'),
+        os.path.join(os.path.dirname(__file__), 'models', 'phishing_xgb.json'),
+        '/app/models/phishing_xgb.json',  # Render deployment path
+        'phishing_xgb.json'
+    ]
+    for path in possible_paths:
+        if os.path.exists(path):
+            logger.info(f"Found existing model at {path}")
+            return
+
+    model_url = os.environ.get('MODEL_URL')
+    metadata_url = os.environ.get('MODEL_METADATA_URL')
+    if not model_url:
+        raise FileNotFoundError('Model not found and MODEL_URL not provided')
+
+    # Prepare destination directory
+    dest_dir = os.path.join(os.path.dirname(__file__), 'models')
+    os.makedirs(dest_dir, exist_ok=True)
+    dest_path = os.path.join(dest_dir, 'phishing_xgb.json')
+
+    # Download model with basic safety checks
+    max_bytes = int(os.environ.get('MODEL_MAX_BYTES', 250 * 1024 * 1024))
+    logger.info(f"Downloading model from {model_url} to {dest_path} (max {max_bytes} bytes)")
+    download_file(model_url, dest_path, max_bytes=max_bytes)
+
+    # Try metadata
+    if metadata_url:
+        meta_dest = os.path.join(dest_dir, 'model_metadata.json')
+        logger.info(f"Downloading model metadata from {metadata_url} to {meta_dest}")
+        download_file(metadata_url, meta_dest, max_bytes=1024 * 1024)  # 1MB
+    else:
+        # Attempt to infer metadata URL by replacing filename
+        try:
+            inferred = model_url.replace('phishing_xgb.json', 'model_metadata.json')
+            meta_dest = os.path.join(dest_dir, 'model_metadata.json')
+            logger.info(f"Attempting inferred metadata URL: {inferred}")
+            download_file(inferred, meta_dest, max_bytes=1024 * 1024)
+        except Exception:
+            logger.info('No metadata downloaded')
+
+
+def download_file(url: str, dest: str, max_bytes: int = 250 * 1024 * 1024, timeout: int = 30):
+    """Download a file from `url` to `dest` with streaming and size limit."""
+    try:
+        with requests.get(url, stream=True, timeout=timeout) as r:
+            r.raise_for_status()
+            total = 0
+            tmp_path = dest + '.part'
+            with open(tmp_path, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    if not chunk:
+                        continue
+                    total += len(chunk)
+                    if total > max_bytes:
+                        f.close()
+                        os.remove(tmp_path)
+                        raise IOError(f"Download exceeds maximum allowed size ({max_bytes} bytes)")
+                    f.write(chunk)
+            # Move temp to final
+            os.replace(tmp_path, dest)
+            logger.info(f"Downloaded {dest} ({total} bytes)")
+    except Exception as e:
+        logger.error(f"Failed to download {url}: {e}")
+        raise
 
 
 # --- Feature Extraction ---

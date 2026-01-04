@@ -8,7 +8,7 @@
 // ===========================================
 const CONFIG = {
   // API endpoint - Update this with your Render URL after deployment
-  API_URL: 'https://phish-block.onrender.com',
+  API_URL: 'phish-block.railway.internal',
   
   // Local development API
   DEV_API_URL: 'http://localhost:8000',
