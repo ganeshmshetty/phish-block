@@ -93,3 +93,9 @@ htmlcov/
 # Extension builds
 extension/build/
 extension/dist/
+
+# ML training artifacts and datasets
+ml_research/datasets/
+ml_research/notebooks/
+ml_research/models/
+ml_research/master_data_*.csv
