@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishBlock</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🛡️</span>
+        <span class="logo-text">PhishBlock</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="main-toggle" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </header>
+
+    <!-- Current Site Analysis -->
+    <section class="current-site" id="current-site-section">
+      <div class="site-header">
+        <span class="site-label">Current Site</span>
+        <button class="refresh-btn" id="refresh-analysis" title="Re-analyze">🔄</button>
+      </div>
+      <div class="site-info">
+        <div class="site-domain" id="current-domain">Loading...</div>
+        <div class="site-status" id="site-status">
+          <span class="status-indicator" id="status-indicator"></span>
+          <span class="status-text" id="status-text">Analyzing...</span>
+        </div>
+      </div>
+      <div class="analysis-details" id="analysis-details">
+        <div class="detail-row">
+          <span class="detail-label">Risk Level</span>
+          <span class="detail-value" id="risk-level">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Confidence</span>
+          <span class="detail-value" id="confidence">-</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="stats-section">
+      <div class="stat-card">
+        <span class="stat-number" id="stat-analyzed">0</span>
+        <span class="stat-label">Analyzed</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="stat-blocked">0</span>
+        <span class="stat-label">Blocked</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="stat-warnings">0</span>
+        <span class="stat-label">Warnings</span>
+      </div>
+    </section>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="protection">Protection</button>
+      <button class="tab-btn" data-tab="history">History</button>
+      <button class="tab-btn" data-tab="settings">Settings</button>
+    </nav>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Protection Tab -->
+      <div class="tab-pane active" id="tab-protection">
+        <div class="protection-options">
+          <div class="option-item">
+            <div class="option-info">
+              <span class="option-title">Auto-Block Phishing</span>
+              <span class="option-desc">Automatically block detected phishing sites</span>
+            </div>
+            <label class="toggle-switch small">
+              <input type="checkbox" id="auto-block" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          
+          <div class="option-item">
+            <div class="option-info">
+              <span class="option-title">Show Notifications</span>
+              <span class="option-desc">Alert when threats are blocked</span>
+            </div>
+            <label class="toggle-switch small">
+              <input type="checkbox" id="show-notifications" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          
+          <div class="option-item">
+            <div class="option-info">
+              <span class="option-title">Strict Mode</span>
+              <span class="option-desc">Lower threshold for blocking (more aggressive)</span>
+            </div>
+            <label class="toggle-switch small">
+              <input type="checkbox" id="strict-mode">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="quick-actions">
+          <button class="action-btn" id="whitelist-current">
+            <span class="action-icon">✓</span>
+            Whitelist This Site
+          </button>
+          <button class="action-btn danger" id="report-site">
+            <span class="action-icon">🚨</span>
+            Report as Phishing
+          </button>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div class="tab-pane" id="tab-history">
+        <div class="history-header">
+          <span>Recently Blocked</span>
+          <button class="clear-btn" id="clear-history">Clear All</button>
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="history-empty">No blocked sites yet</div>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div class="tab-pane" id="tab-settings">
+        <div class="settings-group">
+          <h4>API Configuration</h4>
+          <div class="input-group">
+            <label for="api-url">API Server URL</label>
+            <input type="text" id="api-url" placeholder="https://your-app.onrender.com">
+          </div>
+          <div class="option-item compact">
+            <span class="option-title">Development Mode</span>
+            <label class="toggle-switch small">
+              <input type="checkbox" id="dev-mode">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <button class="action-btn" id="test-api">Test Connection</button>
+          <div class="api-status" id="api-status"></div>
+        </div>
+        
+        <div class="settings-group">
+          <h4>Whitelist</h4>
+          <div class="whitelist-container" id="whitelist-container">
+            <div class="whitelist-empty">No whitelisted domains</div>
+          </div>
+          <div class="input-group">
+            <input type="text" id="whitelist-input" placeholder="example.com">
+            <button class="add-btn" id="add-whitelist">Add</button>
+          </div>
+        </div>
+        
+        <div class="settings-group">
+          <h4>Data</h4>
+          <button class="action-btn" id="clear-cache">Clear Cache</button>
+          <button class="action-btn danger" id="reset-settings">Reset All Settings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>PhishBlock v1.0.0</span>
+      <a href="https://github.com/ganeshmshetty/phish-block" target="_blank">GitHub</a>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
