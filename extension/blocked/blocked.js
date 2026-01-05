@@ -19,55 +19,88 @@ const riskEl = document.getElementById('risk-level');
 riskEl.textContent = riskLevel.toUpperCase();
 riskEl.classList.add(riskLevel);
 
-// Go back button
-document.getElementById('go-back').addEventListener('click', () => {
-  if (window.history.length > 1) {
-    window.history.go(-2); // Go back past the blocked URL
-  } else {
-    window.location.href = 'https://www.google.com';
-  }
-});
-
 // Go home button
 document.getElementById('go-home').addEventListener('click', () => {
   window.location.href = 'https://www.google.com';
+});
+
+// Explain button
+document.getElementById('explain-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('explain-btn');
+  const reasoningSection = document.getElementById('reasoning-section');
+  const reasoningText = document.getElementById('reasoning-text');
+
+  if (reasoningSection.classList.contains('show')) {
+    reasoningSection.classList.remove('show');
+    btn.textContent = 'Explain Why This Was Blocked';
+    return;
+  }
+
+  btn.textContent = 'Loading...';
+  btn.disabled = true;
+  reasoningSection.classList.add('show');
+  reasoningText.textContent = 'Analyzing...';
+
+  try {
+    const response = await fetch('http://localhost:8000/predict/explain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: blockedUrl })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      reasoningText.textContent = result.reasoning;
+      btn.textContent = 'Hide Explanation';
+    } else {
+      reasoningText.textContent = 'Could not generate explanation';
+      btn.textContent = 'Explain Why This Was Blocked';
+    }
+  } catch (error) {
+    console.error('Explain error:', error);
+    reasoningText.textContent = 'Error loading explanation';
+    btn.textContent = 'Explain Why This Was Blocked';
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 // Advanced options toggle
 document.getElementById('advanced-toggle').addEventListener('click', () => {
   const content = document.getElementById('advanced-content');
   const toggle = document.getElementById('advanced-toggle');
-  
+
   if (content.classList.contains('show')) {
     content.classList.remove('show');
-    toggle.textContent = 'Advanced Options ▼';
+    toggle.textContent = 'Advanced Options';
   } else {
     content.classList.add('show');
-    toggle.textContent = 'Advanced Options ▲';
+    toggle.textContent = 'Hide Options';
   }
 });
 
 // Proceed anyway (dangerous!)
 document.getElementById('proceed-anyway').addEventListener('click', () => {
   const confirmed = confirm(
-    '⚠️ WARNING: You are about to visit a suspected phishing site.\n\n' +
+    'WARNING: You are about to visit a suspected phishing site.\n\n' +
     'This site may:\n' +
     '• Steal your passwords and personal information\n' +
     '• Install malware on your device\n' +
-    '• Impersonate legitimate services\n\n' +
+    '• Impersonating legitimate services\n\n' +
     'Are you absolutely sure you want to proceed?'
   );
-  
+
   if (confirmed) {
     const doubleConfirmed = confirm(
-      '🚨 FINAL WARNING 🚨\n\n' +
+      'FINAL WARNING\n\n' +
       'You are taking full responsibility for any consequences.\n\n' +
       'Do NOT enter any passwords, credit card numbers, or personal information on this site.\n\n' +
       'Proceed at your own risk?'
     );
-    
+
     if (doubleConfirmed) {
-      window.location.href = blockedUrl;
+      // Navigate to the blocked URL
+      window.location.replace(blockedUrl);
     }
   }
 });
@@ -79,17 +112,20 @@ document.getElementById('whitelist-domain').addEventListener('click', async () =
     'This will prevent PhishBlock from blocking this domain in the future.\n' +
     'Only do this if you are certain this is a legitimate website.'
   );
-  
+
   if (confirmed) {
     try {
+      // Send message to background script to add to whitelist
       await chrome.runtime.sendMessage({
         action: 'addToWhitelist',
         domain: domain
       });
-      
+
       alert(`${domain} has been added to your whitelist.\n\nYou can now visit this site.`);
-      window.location.href = blockedUrl;
+      // Navigate to the URL after whitelisting
+      window.location.replace(blockedUrl);
     } catch (error) {
+      console.error('Whitelist error:', error);
       alert('Failed to add to whitelist. Please try again.');
     }
   }
@@ -97,30 +133,13 @@ document.getElementById('whitelist-domain').addEventListener('click', async () =
 
 // Report false positive
 document.getElementById('report-false-positive').addEventListener('click', () => {
-  const subject = encodeURIComponent(`PhishBlock False Positive Report: ${domain}`);
-  const body = encodeURIComponent(
-    `URL: ${blockedUrl}\n` +
-    `Domain: ${domain}\n` +
-    `Confidence: ${Math.round(confidence * 100)}%\n` +
-    `Risk Level: ${riskLevel}\n` +
-    `Date: ${new Date().toISOString()}\n\n` +
-    `Additional comments:\n`
-  );
-  
-  // Open email client or show info
   alert(
     'To report a false positive:\n\n' +
     '1. Take a screenshot of this page\n' +
     '2. Note the URL and domain\n' +
-    '3. Submit a report to help improve our detection\n\n' +
-    'Your feedback helps make PhishBlock better for everyone!'
+    '3. Submit a report to help improve detection\n\n' +
+    'Your feedback helps make PhishBlock better!'
   );
-});
-
-// Learn more link
-document.getElementById('learn-more').addEventListener('click', (e) => {
-  e.preventDefault();
-  window.open('https://github.com/ganeshmshetty/phish-block', '_blank');
 });
 
 // Log blocked page view

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishBlock Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L3 7V12C3 17.55 6.84 22.74 12 24C17.16 22.74 21 17.55 21 12V7L12 2Z" fill="#22c55e" />
+                </svg>
+                <h1>PhishBlock Dashboard</h1>
+            </div>
+            <div class="header-actions">
+                <span class="version">v1.0.0</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="main-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </header>
+
+        <nav class="sidebar">
+            <button class="nav-btn active" data-tab="overview">Overview</button>
+            <button class="nav-btn" data-tab="whitelist">Whitelist</button>
+            <button class="nav-btn" data-tab="history">History</button>
+            <button class="nav-btn" data-tab="settings">Settings</button>
+        </nav>
+
+        <main class="content">
+            <!-- Overview Tab -->
+            <div class="tab-pane active" id="tab-overview">
+                <h2>Overview</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="#22c55e" stroke-width="2" />
+                                <path d="M8 12l2 2 4-4" stroke="#22c55e" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="total-analyzed">0</div>
+                            <div class="stat-label">Total Sites Analyzed</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon danger">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="#ef4444" stroke-width="2" />
+                                <path d="M12 8v4M12 16h.01" stroke="#ef4444" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value danger" id="threats-blocked">0</div>
+                            <div class="stat-label">Threats Blocked</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L1 21h22L12 2z" stroke="#f59e0b" stroke-width="2" />
+                                <path d="M12 9v4M12 17h.01" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value warning" id="warnings-shown">0</div>
+                            <div class="stat-label">Warnings Displayed</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="#6b7280" stroke-width="2" />
+                                <path d="M3 9h18M9 3v18" stroke="#6b7280" stroke-width="2" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="cache-size">0</div>
+                            <div class="stat-label">Cached Results</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Model Information</h3>
+                    <div class="model-card">
+                        <div class="model-row">
+                            <span>Extension Version</span>
+                            <span>v1.0.0</span>
+                        </div>
+                        <div class="model-row">
+                            <span>Model Version</span>
+                            <span id="model-version">v1.0.0</span>
+                        </div>
+                        <div class="model-row">
+                            <span>Status</span>
+                            <span id="model-status">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Recent Activity</h3>
+                    <div class="activity-list" id="recent-activity">
+                        <div class="activity-empty">No recent activity</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Whitelist Tab -->
+            <div class="tab-pane" id="tab-whitelist">
+                <h2>Whitelist Management</h2>
+
+                <div class="section">
+                    <div class="section-header">
+                        <p>Whitelisted domains will never be blocked by PhishBlock.</p>
+                    </div>
+
+                    <div class="input-group inline">
+                        <input type="text" id="whitelist-input" placeholder="Enter domain (e.g., example.com)">
+                        <button class="btn btn-primary" id="add-whitelist">Add Domain</button>
+                    </div>
+
+                    <div class="whitelist-table">
+                        <div class="table-header">
+                            <div class="table-col">Domain</div>
+                            <div class="table-col">Added Date</div>
+                            <div class="table-col">Actions</div>
+                        </div>
+                        <div class="table-body" id="whitelist-table-body">
+                            <div class="table-empty">No whitelisted domains yet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-pane" id="tab-history">
+                <h2>Blocked Sites History</h2>
+
+                <div class="section">
+                    <div class="section-header">
+                        <p>Recently blocked phishing attempts and suspicious sites.</p>
+                        <button class="btn btn-secondary" id="clear-history">Clear All</button>
+                    </div>
+
+                    <div class="history-table">
+                        <div class="table-header">
+                            <div class="table-col">URL</div>
+                            <div class="table-col">Risk Level</div>
+                            <div class="table-col">Confidence</div>
+                            <div class="table-col">Date</div>
+                        </div>
+                        <div class="table-body" id="history-table-body">
+                            <div class="table-empty">No blocked sites in history</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-pane" id="tab-settings">
+                <h2>Settings</h2>
+
+                <div class="section">
+                    <h3>Protection Settings</h3>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Auto-Block Phishing Sites</div>
+                                <div class="setting-desc">Automatically block detected phishing websites</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="auto-block" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Show Notifications</div>
+                                <div class="setting-desc">Display alerts when threats are detected</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="show-notifications" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Strict Mode</div>
+                                <div class="setting-desc">Use lower detection threshold (more aggressive)</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="strict-mode">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Data Management</h3>
+                    <div class="button-group">
+                        <button class="btn btn-secondary" id="clear-cache">Clear Cache</button>
+                        <button class="btn btn-secondary" id="export-data">Export Data</button>
+                        <button class="btn btn-danger" id="reset-settings">Reset All Settings</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>About</h3>
+                    <div class="about-info">
+                        <p><strong>PhishBlock</strong> v1.0.0</p>
+                        <p>ML-Powered Phishing Detection</p>
+                        <p class="about-sub">Protecting you from online threats in real-time.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

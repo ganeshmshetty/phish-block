@@ -1,35 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phishing Site Blocked - PhishBlock</title>
   <link rel="stylesheet" href="blocked.css">
 </head>
+
 <body>
   <div class="container">
     <div class="shield-icon">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L3 7V12C3 17.55 6.84 22.74 12 24C17.16 22.74 21 17.55 21 12V7L12 2Z" fill="currentColor" opacity="0.2"/>
-        <path d="M12 2L3 7V12C3 17.55 6.84 22.74 12 24C17.16 22.74 21 17.55 21 12V7L12 2ZM12 22C7.82 20.87 5 16.5 5 12V8.3L12 4.19L19 8.3V12C19 16.5 16.18 20.87 12 22Z" fill="currentColor"/>
-        <path d="M10 14.17L7.83 12L6.41 13.41L10 17L18 9L16.59 7.59L10 14.17Z" fill="currentColor"/>
+        <path d="M12 2L3 7V12C3 17.55 6.84 22.74 12 24C17.16 22.74 21 17.55 21 12V7L12 2Z" fill="currentColor"
+          opacity="0.2" />
+        <path
+          d="M12 2L3 7V12C3 17.55 6.84 22.74 12 24C17.16 22.74 21 17.55 21 12V7L12 2ZM12 22C7.82 20.87 5 16.5 5 12V8.3L12 4.19L19 8.3V12C19 16.5 16.18 20.87 12 22Z"
+          fill="currentColor" />
+        <path d="M10 14.17L7.83 12L6.41 13.41L10 17L18 9L16.59 7.59L10 14.17Z" fill="currentColor" />
       </svg>
     </div>
-    
+
     <h1>Phishing Site Blocked</h1>
-    
+
     <div class="alert-box">
-      <div class="alert-icon">⚠️</div>
+      <div class="alert-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L1 21h22L12 2z" fill="#ef4444" opacity="0.2" />
+          <path d="M12 4.5L3.5 19h17L12 4.5zM12 2L1 21h22L12 2z" stroke="#ef4444" stroke-width="2" />
+          <path d="M12 10v4M12 16v2" stroke="#ef4444" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </div>
       <div class="alert-content">
         <h2>This website has been identified as a phishing attempt</h2>
-        <p>PhishBlock has prevented you from accessing a potentially dangerous website that may try to steal your personal information.</p>
+        <p>PhishBlock has prevented you from accessing a potentially dangerous website that may try to steal your
+          personal information.</p>
       </div>
     </div>
-    
+
     <div class="details-card">
       <h3>Blocked URL</h3>
       <div class="url-display" id="blocked-url">Loading...</div>
-      
+
       <div class="stats-grid">
         <div class="stat-item">
           <span class="stat-label">Risk Level</span>
@@ -44,56 +56,59 @@
           <span class="stat-value" id="domain">-</span>
         </div>
       </div>
+
+      <button class="explain-btn" id="explain-btn">Explain Why This Was Blocked</button>
+      <div class="reasoning-section" id="reasoning-section">
+        <div class="reasoning-label">Analysis Reasoning:</div>
+        <div class="reasoning-text" id="reasoning-text">Loading...</div>
+      </div>
     </div>
-    
+
     <div class="warning-list">
       <h3>Why was this blocked?</h3>
       <ul>
-        <li>🔍 The URL contains patterns commonly used in phishing attacks</li>
-        <li>🎭 The domain may be impersonating a legitimate website</li>
-        <li>🔒 This site may attempt to steal your credentials or personal data</li>
-        <li>💳 Entering sensitive information here could lead to identity theft</li>
+        <li>The URL contains patterns commonly used in phishing attacks</li>
+        <li>The domain may be impersonating a legitimate website</li>
+        <li>This site may attempt to steal your credentials or personal data</li>
+        <li>Entering sensitive information here could lead to identity theft</li>
       </ul>
     </div>
-    
+
     <div class="tips-section">
       <h3>Stay Safe Online</h3>
       <div class="tips-grid">
         <div class="tip-card">
-          <span class="tip-icon">🔗</span>
+          <span class="tip-icon">1</span>
           <p>Always verify URLs before entering sensitive information</p>
         </div>
         <div class="tip-card">
-          <span class="tip-icon">🔐</span>
+          <span class="tip-icon">2</span>
           <p>Look for HTTPS and valid security certificates</p>
         </div>
         <div class="tip-card">
-          <span class="tip-icon">📧</span>
+          <span class="tip-icon">3</span>
           <p>Be cautious of links received via email or messages</p>
         </div>
         <div class="tip-card">
-          <span class="tip-icon">🏦</span>
+          <span class="tip-icon">4</span>
           <p>Access banking sites by typing the URL directly</p>
         </div>
       </div>
     </div>
-    
+
     <div class="actions">
-      <button class="btn btn-primary" id="go-back">
-        ← Go Back to Safety
-      </button>
-      <button class="btn btn-secondary" id="go-home">
-        🏠 Go to Homepage
+      <button class="btn btn-primary" id="go-home">
+        Go to Homepage
       </button>
     </div>
-    
+
     <div class="advanced-section">
       <button class="advanced-toggle" id="advanced-toggle">
-        Advanced Options ▼
+        Advanced Options
       </button>
       <div class="advanced-content" id="advanced-content">
         <p class="warning-text">
-          ⚠️ <strong>Warning:</strong> Proceeding to this site may put your personal information at risk.
+          <strong>Warning:</strong> Proceeding to this site may put your personal information at risk.
           Only continue if you are absolutely certain this is a false positive.
         </p>
         <div class="advanced-actions">
@@ -109,13 +124,14 @@
         </div>
       </div>
     </div>
-    
+
     <footer>
       <p>Protected by <strong>PhishBlock</strong> - Real-time Phishing Detection</p>
-      <p class="footer-sub">Powered by Machine Learning | <a href="#" id="learn-more">Learn More</a></p>
+      <p class="footer-sub">Powered by Machine Learning</p>
     </footer>
   </div>
-  
+
   <script src="blocked.js"></script>
 </body>
+
 </html>
