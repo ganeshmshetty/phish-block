@@ -8,10 +8,14 @@
 // ===========================================
 const CONFIG = {
   // API endpoint - Update this with your Render URL after deployment
-  API_URL: 'phish-block.railway.internal',
-  
+  // Removed hard-coded production API URL. Set `apiUrl` via extension settings if needed.
+
   // Local development API
   DEV_API_URL: 'http://localhost:8000',
+  // Optional production API URL. If you have a deployed API, set this to its base URL.
+  // Using the Railway/deployed endpoint here as a safe fallback so the extension
+  // can function without requiring the user to configure `settings.apiUrl` first.
+  PROD_API_URL: 'https://phish-block-production.up.railway.app',
   
   // Analysis settings
   CACHE_DURATION_MS: 5 * 60 * 1000, // 5 minutes
@@ -41,8 +45,8 @@ const DEFAULT_SETTINGS = {
   autoBlock: true,
   showNotifications: true,
   whitelist: [],
-  apiUrl: CONFIG.API_URL,
-  devMode: false,
+  apiUrl: '', // Leave blank by default; set via extension settings if needed
+  devMode: true,
   strictMode: false,
   logHistory: true
 };
@@ -57,7 +61,15 @@ let settings = { ...DEFAULT_SETTINGS };
  * Get current API URL based on settings
  */
 function getApiUrl() {
-  return settings.devMode ? CONFIG.DEV_API_URL : settings.apiUrl;
+  // Priority:
+  // 1. If devMode is enabled -> use local dev API
+  // 2. If user provided `settings.apiUrl` -> use that
+  // 3. If a PROD_API_URL is configured in CONFIG -> use that
+  // 4. Fall back to DEV_API_URL as last resort
+  if (settings.devMode) return CONFIG.DEV_API_URL;
+  if (settings.apiUrl) return settings.apiUrl;
+  if (CONFIG.PROD_API_URL) return CONFIG.PROD_API_URL;
+  return CONFIG.DEV_API_URL;
 }
 
 /**
@@ -152,10 +164,14 @@ async function analyzeUrl(url) {
   }
   
   try {
+    const base = getApiUrl();
+    const endpoint = base ? `${String(base).replace(/\/$/, '')}/predict` : '/predict';
+    console.log('[PhishBlock] Analyzing URL, endpoint:', endpoint, 'url:', url);
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
     
-    const response = await fetch(`${getApiUrl()}/predict`, {
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -167,7 +183,10 @@ async function analyzeUrl(url) {
     clearTimeout(timeoutId);
     
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      // Try to read response body for better diagnostics
+      let text = '';
+      try { text = await response.text(); } catch (e) { text = `<could not read response: ${e.message}>`; }
+      throw new Error(`API error: ${response.status} ${response.statusText} - ${text}`);
     }
     
     const result = await response.json();
@@ -182,7 +201,14 @@ async function analyzeUrl(url) {
     
     return result;
   } catch (error) {
-    console.error('[PhishBlock] Analysis failed:', error.message);
+    if (error.name === 'AbortError') {
+      console.error('[PhishBlock] Analysis failed: request timed out after', CONFIG.REQUEST_TIMEOUT_MS, 'ms');
+    } else {
+      console.error('[PhishBlock] Analysis failed:', error && error.message ? error.message : error);
+    }
+    // expose more detail in stats for debugging
+    if (!analysisStats.lastError) analysisStats.lastError = {};
+    analysisStats.lastError = { message: error && error.message ? error.message : String(error), time: Date.now(), url };
     return null;
   }
 }
@@ -423,7 +449,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({
         ...analysisStats,
         cacheSize: urlCache.size,
-        enabled: settings.enabled
+        enabled: settings.enabled,
+        lastError: analysisStats.lastError || null
       });
       break;
       
@@ -513,8 +540,13 @@ async function loadSettings() {
   const stored = await chrome.storage.sync.get('settings');
   if (stored.settings) {
     settings = { ...DEFAULT_SETTINGS, ...stored.settings };
+  } else {
+    // First run - save default settings
+    settings = { ...DEFAULT_SETTINGS };
+    await chrome.storage.sync.set({ settings });
+    console.log('[PhishBlock] First run - saved default settings');
   }
-  console.log('[PhishBlock] Settings loaded:', settings.enabled ? 'Enabled' : 'Disabled');
+  console.log('[PhishBlock] Settings loaded:', settings.enabled ? 'Enabled' : 'Disabled', 'DevMode:', settings.devMode);
 }
 
 /**
