@@ -6,8 +6,8 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f8f9fa;
-    color: #1f2937;
+    background: #f1f5f9;
+    color: #0f172a;
 }
 
 .dashboard-container {
@@ -25,7 +25,7 @@ body {
     align-items: center;
     padding: 0 32px;
     background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .logo {
@@ -93,7 +93,7 @@ body {
 }
 
 .toggle-switch input:checked+.toggle-slider {
-    background: #22c55e;
+    background: #10b981;
 }
 
 .toggle-switch input:checked+.toggle-slider:before {
@@ -129,8 +129,8 @@ body {
 
 .nav-btn.active {
     background: #f0fdf4;
-    color: #22c55e;
-    border-left-color: #22c55e;
+    color: #10b981;
+    border-left-color: #10b981;
     font-weight: 500;
 }
 
@@ -206,13 +206,13 @@ body {
 .stat-value {
     font-size: 32px;
     font-weight: 700;
-    color: #22c55e;
+    color: #10b981;
     line-height: 1;
     margin-bottom: 4px;
 }
 
 .stat-value.danger {
-    color: #ef4444;
+    color: #e11d48;
 }
 
 .stat-value.warning {
@@ -342,7 +342,7 @@ body {
 
 .input-group input:focus {
     outline: none;
-    border-color: #22c55e;
+    border-color: #10b981;
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
@@ -359,12 +359,12 @@ body {
 }
 
 .btn-primary {
-    background: #22c55e;
+    background: #10b981;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #16a34a;
+    background: #059669;
 }
 
 .btn-secondary {
@@ -379,12 +379,12 @@ body {
 }
 
 .btn-danger {
-    background: #ef4444;
+    background: #e11d48;
     color: white;
 }
 
 .btn-danger:hover {
-    background: #dc2626;
+    background: #be123c;
 }
 
 /* Activity List */
@@ -406,7 +406,7 @@ body {
 }
 
 .activity-item:hover {
-    border-color: #22c55e;
+    border-color: #10b981;
     box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
 }
 
@@ -424,12 +424,12 @@ body {
 
 .activity-icon.critical {
     background: #fef2f2;
-    color: #ef4444;
+    color: #e11d48;
 }
 
 .activity-icon.high {
     background: #fef2f2;
-    color: #ef4444;
+    color: #e11d48;
 }
 
 .activity-icon.medium {
@@ -439,7 +439,7 @@ body {
 
 .activity-icon.low {
     background: #f0fdf4;
-    color: #22c55e;
+    color: #10b981;
 }
 
 .activity-info {
@@ -535,7 +535,7 @@ body {
 .remove-btn {
     background: #fef2f2;
     border: 1px solid #fecaca;
-    color: #ef4444;
+    color: #e11d48;
     padding: 6px 12px;
     border-radius: 6px;
     font-size: 12px;

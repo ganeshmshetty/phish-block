@@ -6,9 +6,9 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background: #f8f9fa;
+  background: #f1f5f9;
   min-height: 100vh;
-  color: #1f2937;
+  color: #0f172a;
   line-height: 1.6;
 }
 
@@ -30,12 +30,12 @@ h1 {
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 20px;
-  color: #ef4444;
+  color: #e11d48;
 }
 
 .alert-box {
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 30px;
@@ -77,15 +77,15 @@ h1 {
 }
 
 .url-display {
-  background: #f9fafb;
+  background: #f8fafc;
   border-radius: 8px;
   padding: 12px 16px;
   font-family: 'Monaco', 'Consolas', monospace;
   font-size: 0.9rem;
-  color: #ef4444;
+  color: #e11d48;
   word-break: break-all;
   margin-bottom: 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e2e8f0;
 }
 
 .stats-grid {
@@ -124,12 +124,12 @@ h1 {
 }
 
 .risk-level.critical {
-  background: #dc2626;
+  background: #be123c;
   color: white;
 }
 
 .risk-level.high {
-  background: #ef4444;
+  background: #e11d48;
   color: white;
 }
 
@@ -139,7 +139,7 @@ h1 {
 }
 
 .risk-level.low {
-  background: #22c55e;
+  background: #10b981;
   color: white;
 }
 
@@ -190,82 +190,7 @@ h1 {
   line-height: 1.6;
 }
 
-.warning-list {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 30px;
-  text-align: left;
-  border: 1px solid #e5e7eb;
-}
 
-.warning-list h3 {
-  font-size: 1rem;
-  margin-bottom: 16px;
-  color: #1f2937;
-}
-
-.warning-list ul {
-  list-style: none;
-}
-
-.warning-list li {
-  padding: 8px 0;
-  padding-left: 24px;
-  color: #4b5563;
-  font-size: 0.95rem;
-  position: relative;
-}
-
-.warning-list li:before {
-  content: "-";
-  position: absolute;
-  left: 8px;
-  color: #ef4444;
-}
-
-.tips-section {
-  margin-bottom: 30px;
-}
-
-.tips-section h3 {
-  font-size: 1rem;
-  margin-bottom: 16px;
-  color: #1f2937;
-}
-
-.tips-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.tip-card {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 16px;
-  text-align: center;
-  border: 1px solid #e5e7eb;
-}
-
-.tip-icon {
-  font-size: 1.2rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: #f3f4f6;
-  border-radius: 50%;
-  margin: 0 auto 8px;
-  color: #22c55e;
-}
-
-.tip-card p {
-  font-size: 0.85rem;
-  color: #6b7280;
-}
 
 .actions {
   display: flex;
@@ -289,12 +214,12 @@ h1 {
 }
 
 .btn-primary {
-  background: #22c55e;
+  background: #10b981;
   color: white;
 }
 
 .btn-primary:hover {
-  background: #16a34a;
+  background: #059669;
 }
 
 .btn-secondary {
@@ -309,12 +234,12 @@ h1 {
 }
 
 .btn-danger {
-  background: #ef4444;
+  background: #e11d48;
   color: white;
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background: #be123c;
 }
 
 .btn-outline {
@@ -348,11 +273,11 @@ h1 {
 
 .advanced-content {
   display: none;
-  background: #fee2e2;
+  background: #fff1f2;
   border-radius: 12px;
   padding: 20px;
   margin-top: 16px;
-  border: 1px solid #fca5a5;
+  border: 1px solid #fecdd3;
 }
 
 .advanced-content.show {
@@ -395,10 +320,6 @@ footer p {
   }
 
   .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tips-grid {
     grid-template-columns: 1fr;
   }
 

@@ -80,66 +80,59 @@ document.getElementById('advanced-toggle').addEventListener('click', () => {
 });
 
 // Proceed anyway (dangerous!)
-document.getElementById('proceed-anyway').addEventListener('click', () => {
+document.getElementById('proceed-anyway').addEventListener('click', async () => {
   const confirmed = confirm(
-    'WARNING: You are about to visit a suspected phishing site.\n\n' +
-    'This site may:\n' +
-    '• Steal your passwords and personal information\n' +
-    '• Install malware on your device\n' +
-    '• Impersonating legitimate services\n\n' +
-    'Are you absolutely sure you want to proceed?'
-  );
-
-  if (confirmed) {
-    const doubleConfirmed = confirm(
-      'FINAL WARNING\n\n' +
-      'You are taking full responsibility for any consequences.\n\n' +
-      'Do NOT enter any passwords, credit card numbers, or personal information on this site.\n\n' +
-      'Proceed at your own risk?'
-    );
-
-    if (doubleConfirmed) {
-      // Navigate to the blocked URL
-      window.location.replace(blockedUrl);
-    }
-  }
-});
-
-// Add to whitelist
-document.getElementById('whitelist-domain').addEventListener('click', async () => {
-  const confirmed = confirm(
-    `Add "${domain}" to your whitelist?\n\n` +
-    'This will prevent PhishBlock from blocking this domain in the future.\n' +
-    'Only do this if you are certain this is a legitimate website.'
+    'WARNING: This is a suspected phishing site!\n\n' +
+    '• May steal your passwords and personal information\n' +
+    '• May install malware on your device\n' +
+    '• Do NOT enter any sensitive information\n\n' +
+    'Proceed at your own risk?'
   );
 
   if (confirmed) {
     try {
-      // Send message to background script to add to whitelist
+      // Tell background to temporarily allow this URL
       await chrome.runtime.sendMessage({
-        action: 'addToWhitelist',
-        domain: domain
+        action: 'temporarilyAllow',
+        url: blockedUrl
       });
 
-      alert(`${domain} has been added to your whitelist.\n\nYou can now visit this site.`);
-      // Navigate to the URL after whitelisting
-      window.location.replace(blockedUrl);
+      // Navigate using chrome.tabs API
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      await chrome.tabs.update(tab.id, { url: blockedUrl });
     } catch (error) {
-      console.error('Whitelist error:', error);
-      alert('Failed to add to whitelist. Please try again.');
+      console.error('Navigation error:', error);
+      window.location.href = blockedUrl;
     }
   }
 });
 
-// Report false positive
+// Add to whitelist - no confirmation needed, button label is clear
+document.getElementById('whitelist-domain').addEventListener('click', async () => {
+  try {
+    // Send message to background script to add to whitelist
+    await chrome.runtime.sendMessage({
+      action: 'addToWhitelist',
+      domain: domain
+    });
+
+    // Navigate using chrome.tabs API
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await chrome.tabs.update(tab.id, { url: blockedUrl });
+  } catch (error) {
+    console.error('Whitelist error:', error);
+  }
+});
+
+// Report false positive - just open a simple thank you message in the reasoning section
 document.getElementById('report-false-positive').addEventListener('click', () => {
-  alert(
-    'To report a false positive:\n\n' +
-    '1. Take a screenshot of this page\n' +
-    '2. Note the URL and domain\n' +
-    '3. Submit a report to help improve detection\n\n' +
-    'Your feedback helps make PhishBlock better!'
-  );
+  const reasoningSection = document.getElementById('reasoning-section');
+  const reasoningText = document.getElementById('reasoning-text');
+  const btn = document.getElementById('explain-btn');
+
+  reasoningSection.classList.add('show');
+  reasoningText.textContent = 'Thank you for your feedback! To report a false positive, please note the URL and domain shown above. Your feedback helps improve PhishBlock detection.';
+  btn.textContent = 'Hide Message';
 });
 
 // Log blocked page view
@@ -149,3 +142,4 @@ console.log('[PhishBlock] Blocked page loaded:', {
   confidence: confidence,
   riskLevel: riskLevel
 });
+

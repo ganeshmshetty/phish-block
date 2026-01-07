@@ -82,15 +82,22 @@ function updateAnalysisUI(result) {
   const statusText = document.getElementById('status-text');
   const riskLevel = document.getElementById('risk-level');
   const confidence = document.getElementById('confidence');
+  const checkIcon = document.getElementById('status-icon-safe');
 
   if (result.is_phishing) {
     statusIndicator.className = 'status-indicator danger';
+    statusIndicator.style.display = 'inline-block';
+    checkIcon.style.display = 'none';
     statusText.textContent = 'Phishing Detected';
   } else if (result.risk_level === 'medium' || result.risk_level === 'high') {
     statusIndicator.className = 'status-indicator warning';
+    statusIndicator.style.display = 'inline-block';
+    checkIcon.style.display = 'none';
     statusText.textContent = 'Suspicious';
   } else {
-    statusIndicator.className = 'status-indicator safe';
+    // Safe - show check icon instead of dot
+    statusIndicator.style.display = 'none';
+    checkIcon.style.display = 'inline-block';
     statusText.textContent = result.is_popular_domain ? 'Trusted Site' : 'Appears Safe';
   }
 
@@ -110,8 +117,11 @@ function showNoAnalysis(message = 'Cannot analyze') {
   const statusText = document.getElementById('status-text');
   const riskLevel = document.getElementById('risk-level');
   const confidence = document.getElementById('confidence');
+  const checkIcon = document.getElementById('status-icon-safe');
 
   statusIndicator.className = 'status-indicator';
+  statusIndicator.style.display = 'inline-block';
+  checkIcon.style.display = 'none';
   statusText.textContent = message;
   riskLevel.textContent = '-';
   riskLevel.className = 'detail-value';
@@ -141,6 +151,7 @@ function formatNumber(num) {
 // Event Handlers
 function setupEventListeners() {
   document.getElementById('main-toggle').addEventListener('change', async (e) => {
+    console.log('[PhishBlock Popup] Toggle changed to:', e.target.checked);
     await chrome.runtime.sendMessage({
       action: 'updateSettings',
       settings: { enabled: e.target.checked }

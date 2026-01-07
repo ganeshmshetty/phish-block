@@ -6,6 +6,32 @@
 let settings = {};
 let stats = {};
 
+// Toast notification helper
+function showToast(message, type = 'success') {
+    // Remove existing toast
+    const existing = document.querySelector('.toast-notification');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 8px;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#e11d48' : '#64748b'};
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     await loadSettings();
@@ -24,7 +50,6 @@ async function loadSettings() {
 
     document.getElementById('main-toggle').checked = settings.enabled;
     document.getElementById('auto-block').checked = settings.autoBlock;
-    document.getElementById('show-notifications').checked = settings.showNotifications;
     document.getElementById('strict-mode').checked = settings.strictMode;
 }
 
@@ -166,10 +191,6 @@ function setupEventListeners() {
         await updateSetting('autoBlock', e.target.checked);
     });
 
-    document.getElementById('show-notifications').addEventListener('change', async (e) => {
-        await updateSetting('showNotifications', e.target.checked);
-    });
-
     document.getElementById('strict-mode').addEventListener('change', async (e) => {
         await updateSetting('strictMode', e.target.checked);
     });
@@ -208,7 +229,7 @@ function setupEventListeners() {
     document.getElementById('clear-cache').addEventListener('click', async () => {
         if (confirm('Clear all cached results?')) {
             await chrome.runtime.sendMessage({ action: 'clearCache' });
-            alert('Cache cleared');
+            showToast('Cache cleared');
             loadStats();
         }
     });

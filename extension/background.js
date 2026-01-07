@@ -39,11 +39,13 @@ let analysisStats = {
   sessionStart: Date.now()
 };
 
+// URLs temporarily allowed by user (bypass blocking once)
+let temporarilyAllowedUrls = new Set();
+
 // Default settings
 const DEFAULT_SETTINGS = {
   enabled: true,
   autoBlock: true,
-  showNotifications: true,
   whitelist: [],
   apiUrl: '', // Leave blank by default; set via extension settings if needed
   devMode: true,
@@ -57,9 +59,9 @@ let settings = { ...DEFAULT_SETTINGS };
 // UTILITY FUNCTIONS
 // ===========================================
 
-/**
- * Get current API URL based on settings
- */
+
+//Get current API URL based on settings
+
 function getApiUrl() {
   // Priority:
   // 1. If devMode is enabled -> use local dev API
@@ -77,6 +79,13 @@ function getApiUrl() {
  */
 function shouldSkipUrl(url) {
   if (!url) return true;
+
+  // Check if temporarily allowed (one-time bypass)
+  if (temporarilyAllowedUrls.has(url)) {
+    temporarilyAllowedUrls.delete(url); // Remove after use (one-time only)
+    console.log('[PhishBlock] Temporarily allowed URL:', url);
+    return true;
+  }
 
   // Skip browser internal pages
   const skipPatterns = [
@@ -235,15 +244,6 @@ function blockPage(tabId, url, result) {
   if (settings.logHistory) {
     logBlockedUrl(url, result);
   }
-
-  // Show notification
-  if (settings.showNotifications) {
-    showNotification(
-      '🛡️ Phishing Blocked!',
-      `Blocked access to ${extractDomain(url)}`,
-      'blocked'
-    );
-  }
 }
 
 /**
@@ -258,14 +258,6 @@ function showWarning(tabId, url, result) {
   }).catch(err => console.log('[PhishBlock] Could not inject warning:', err));
 
   analysisStats.warningsShown++;
-
-  if (settings.showNotifications) {
-    showNotification(
-      '⚠️ Suspicious Website',
-      `${extractDomain(url)} shows phishing indicators`,
-      'warning'
-    );
-  }
 }
 /**
  * Function to inject warning banner (runs in page context)
@@ -342,18 +334,6 @@ function injectWarningBanner(confidence, riskLevel, recommendation) {
   };
 }
 
-/**
- * Show browser notification
- */
-function showNotification(title, message, type) {
-  chrome.notifications.create({
-    type: 'basic',
-    iconUrl: chrome.runtime.getURL('icons/icon128.png'),
-    title,
-    message,
-    priority: type === 'blocked' ? 2 : 1
-  });
-}
 
 /**
  * Log blocked URL to history
@@ -463,6 +443,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'updateSettings':
       settings = { ...settings, ...message.settings };
       chrome.storage.sync.set({ settings });
+      console.log('[PhishBlock] Settings updated:', settings);
       sendResponse({ success: true });
       break;
 
@@ -513,6 +494,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         .then(data => sendResponse({ success: true, data }))
         .catch(err => sendResponse({ success: false, error: err.message }));
       return true;
+
+    case 'temporarilyAllow':
+      // Add URL to temporary allow list (expires after navigation)
+      temporarilyAllowedUrls.add(message.url);
+      // Auto-remove after 30 seconds
+      setTimeout(() => temporarilyAllowedUrls.delete(message.url), 30000);
+      sendResponse({ success: true });
+      break;
 
     default:
       sendResponse({ error: 'Unknown action' });

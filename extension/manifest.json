@@ -5,42 +5,31 @@
   "version": "1.0.0",
   "description": "Real-time phishing URL detection powered by machine learning. Protects you from malicious websites instantly.",
   "author": "PhishBlock",
-  
   "icons": {
-    "16": "icons/icon16.png",
-    "32": "icons/icon32.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "48": "icons/glass.png",
+    "128": "icons/glass.png"
   },
-  
   "permissions": [
     "storage",
     "tabs",
     "webNavigation",
-    "notifications",
     "alarms"
   ],
-  
   "host_permissions": [
     "<all_urls>",
     "http://localhost:8000/*"
   ],
-  
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
-  
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
-      "16": "icons/icon16.png",
-      "32": "icons/icon32.png",
-      "48": "icons/icon48.png"
+      "48": "icons/glass.png"
     },
     "default_title": "PhishBlock"
   },
-  
   "web_accessible_resources": [
     {
       "resources": [
@@ -49,10 +38,11 @@
         "blocked/blocked.js",
         "icons/*"
       ],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
-  
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   }
