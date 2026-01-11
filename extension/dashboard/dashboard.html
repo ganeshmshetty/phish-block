@@ -102,6 +102,10 @@
                             <span>v1.0.0</span>
                         </div>
                         <div class="model-row">
+                            <span>API Endpoint</span>
+                            <span id="model-endpoint">Detecting...</span>
+                        </div>
+                        <div class="model-row">
                             <span>Model Version</span>
                             <span id="model-version">v1.0.0</span>
                         </div>
@@ -196,6 +200,17 @@
                             </div>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="strict-mode">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Developer Mode</div>
+                                <div class="setting-desc">Use local API (localhost:8000) for testing</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="dev-mode">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>

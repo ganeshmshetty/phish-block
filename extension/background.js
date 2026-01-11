@@ -63,15 +63,16 @@ let settings = { ...DEFAULT_SETTINGS };
 //Get current API URL based on settings
 
 function getApiUrl() {
-  // Priority:
-  // 1. If devMode is enabled -> use local dev API
-  // 2. If user provided `settings.apiUrl` -> use that
-  // 3. If a PROD_API_URL is configured in CONFIG -> use that
-  // 4. Fall back to DEV_API_URL as last resort
-  if (settings.devMode) return CONFIG.DEV_API_URL;
-  if (settings.apiUrl) return settings.apiUrl;
-  if (CONFIG.PROD_API_URL) return CONFIG.PROD_API_URL;
-  return CONFIG.DEV_API_URL;
+  let url = CONFIG.DEV_API_URL;
+  if (settings.devMode) {
+    url = CONFIG.DEV_API_URL;
+  } else if (settings.apiUrl) {
+    url = settings.apiUrl;
+  } else if (CONFIG.PROD_API_URL) {
+    url = CONFIG.PROD_API_URL;
+  }
+  console.log('[PhishBlock] Active API URL:', url);
+  return url;
 }
 
 /**
@@ -489,10 +490,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
 
     case 'testApi':
-      fetch(`${getApiUrl()}/health`)
+      const healthEndpoint = `${getApiUrl().replace(/\/$/, '')}/health`;
+      console.log('[PhishBlock] Testing API health at:', healthEndpoint);
+      fetch(healthEndpoint, { cache: 'no-cache' })
         .then(res => res.json())
-        .then(data => sendResponse({ success: true, data }))
-        .catch(err => sendResponse({ success: false, error: err.message }));
+        .then(data => {
+          console.log('[PhishBlock] API health response:', data);
+          sendResponse({ success: true, data });
+        })
+        .catch(err => {
+          console.error('[PhishBlock] API health test failed:', err);
+          sendResponse({ success: false, error: err.message });
+        });
       return true;
 
     case 'temporarilyAllow':
@@ -501,6 +510,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Auto-remove after 30 seconds
       setTimeout(() => temporarilyAllowedUrls.delete(message.url), 30000);
       sendResponse({ success: true });
+      break;
+
+    case 'explainUrl':
+      const explainEndpoint = `${getApiUrl().replace(/\/$/, '')}/predict/explain`;
+      fetch(explainEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: message.url })
+      })
+        .then(res => res.json())
+        .then(data => sendResponse(data))
+        .catch(err => sendResponse({ error: err.message }));
+      return true;
+
+    case 'getApiUrl':
+      sendResponse({ url: getApiUrl() });
       break;
 
     default:

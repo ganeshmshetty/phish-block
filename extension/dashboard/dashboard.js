@@ -51,6 +51,7 @@ async function loadSettings() {
     document.getElementById('main-toggle').checked = settings.enabled;
     document.getElementById('auto-block').checked = settings.autoBlock;
     document.getElementById('strict-mode').checked = settings.strictMode;
+    document.getElementById('dev-mode').checked = settings.devMode;
 }
 
 async function loadStats() {
@@ -64,17 +65,25 @@ async function loadStats() {
 
 async function loadModelInfo() {
     try {
+        const apiUrlResponse = await chrome.runtime.sendMessage({ action: 'getApiUrl' });
+        if (apiUrlResponse && apiUrlResponse.url) {
+            document.getElementById('model-endpoint').textContent = apiUrlResponse.url;
+        }
+
         const result = await chrome.runtime.sendMessage({ action: 'testApi' });
         if (result.success && result.data) {
-            document.getElementById('model-version').textContent = 'v1.0.0';
-            document.getElementById('model-status').textContent = result.data.status === 'healthy' ? 'Connected' : 'Offline';
+            document.getElementById('model-version').textContent = result.data.model_version || 'v1.0.0';
+            document.getElementById('model-status').textContent = result.data.status === 'healthy' ? 'Connected' : 'Unhealthy';
+            document.getElementById('model-status').className = result.data.status === 'healthy' ? 'status-safe' : 'status-danger';
         } else {
-            document.getElementById('model-version').textContent = 'v1.0.0';
-            document.getElementById('model-status').textContent = 'Offline';
+            document.getElementById('model-version').textContent = '-';
+            document.getElementById('model-status').textContent = 'Offline (' + (result.error || 'No response') + ')';
+            document.getElementById('model-status').className = 'status-danger';
         }
-    } catch {
-        document.getElementById('model-version').textContent = 'v1.0.0';
-        document.getElementById('model-status').textContent = 'Error';
+    } catch (err) {
+        document.getElementById('model-version').textContent = '-';
+        document.getElementById('model-status').textContent = 'Error: ' + err.message;
+        document.getElementById('model-status').className = 'status-danger';
     }
 }
 
@@ -193,6 +202,11 @@ function setupEventListeners() {
 
     document.getElementById('strict-mode').addEventListener('change', async (e) => {
         await updateSetting('strictMode', e.target.checked);
+    });
+
+    document.getElementById('dev-mode').addEventListener('change', async (e) => {
+        await updateSetting('devMode', e.target.checked);
+        await loadModelInfo(); // Refresh endpoint display
     });
 
     // Whitelist

@@ -42,18 +42,16 @@ document.getElementById('explain-btn').addEventListener('click', async () => {
   reasoningText.textContent = 'Analyzing...';
 
   try {
-    const response = await fetch('http://localhost:8000/predict/explain', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: blockedUrl })
+    const result = await chrome.runtime.sendMessage({
+      action: 'explainUrl',
+      url: blockedUrl
     });
 
-    if (response.ok) {
-      const result = await response.json();
+    if (result && !result.error) {
       reasoningText.textContent = result.reasoning;
       btn.textContent = 'Hide Explanation';
     } else {
-      reasoningText.textContent = 'Could not generate explanation';
+      reasoningText.textContent = 'Could not generate explanation: ' + (result?.error || 'Unknown error');
       btn.textContent = 'Explain Why This Was Blocked';
     }
   } catch (error) {
