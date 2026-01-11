@@ -62,15 +62,20 @@ def initialize_ml():
     
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        logger.warning("API key not found. Please set GROQ_API_KEY in environment.")
+        logger.warning("GROQ_API_KEY not found in environment variables")
+        logger.warning("Available env vars: " + ", ".join([k for k in os.environ.keys() if not k.startswith("_")]))
         return False
     
+    logger.info(f"✓ GROQ_API_KEY found (length: {len(api_key)}, starts with: {api_key[:4]}...)")
+    
     try:
+        logger.info("Attempting to initialize Groq client...")
         ml_client = Groq(api_key=api_key)
-        logger.info("ML model initialized successfully")
+        logger.info("✓ ML model initialized successfully")
         return True
     except Exception as e:
-        logger.error(f"Failed to initialize ML model: {e}")
+        logger.error(f"❌ Failed to initialize ML model: {type(e).__name__}: {str(e)}")
+        logger.exception("Full traceback:")
         return False
 
 @app.on_event("startup")
