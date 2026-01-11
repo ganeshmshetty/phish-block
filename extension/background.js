@@ -15,7 +15,7 @@ const CONFIG = {
   // Optional production API URL. If you have a deployed API, set this to its base URL.
   // Using the Railway/deployed endpoint here as a safe fallback so the extension
   // can function without requiring the user to configure `settings.apiUrl` first.
-  PROD_API_URL: 'https://phish-block-production.up.railway.app',
+  PROD_API_URL: 'https://phish-block-production.up.railway.app/',
 
   // Analysis settings
   CACHE_DURATION_MS: 5 * 60 * 1000, // 5 minutes
@@ -48,7 +48,7 @@ const DEFAULT_SETTINGS = {
   autoBlock: true,
   whitelist: [],
   apiUrl: '', // Leave blank by default; set via extension settings if needed
-  devMode: true,
+  devMode: false,
   strictMode: false,
   logHistory: true
 };
