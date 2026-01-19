@@ -133,6 +133,66 @@ document.getElementById('report-false-positive').addEventListener('click', () =>
   btn.textContent = 'Hide Message';
 });
 
+// ===========================================
+// SANDBOX VIEWER
+// ===========================================
+
+const sandboxModal = document.getElementById('sandbox-modal');
+const sandboxIframe = document.getElementById('sandbox-iframe');
+const sandboxContent = document.querySelector('.sandbox-content');
+
+// Open sandbox viewer
+document.getElementById('view-sandbox').addEventListener('click', () => {
+  const confirmed = confirm(
+    'SANDBOX MODE\n\n' +
+    'The page will be loaded with the following restrictions:\n' +
+    '• Forms CANNOT be submitted\n' +
+    '• Navigation outside iframe is BLOCKED\n' +
+    '• Pop-ups and downloads are BLOCKED\n' +
+    '• JavaScript IS allowed (read-only)\n\n' +
+    'Do NOT enter any sensitive information!\n\n' +
+    'Continue?'
+  );
+
+  if (confirmed) {
+    // Show modal
+    sandboxModal.classList.add('show');
+    sandboxContent.classList.add('loading');
+
+    // Load the blocked URL in sandboxed iframe
+    // The sandbox attribute restricts: scripts, forms, popups, top navigation
+    sandboxIframe.src = blockedUrl;
+
+    // Remove loading state when iframe loads
+    sandboxIframe.onload = () => {
+      sandboxContent.classList.remove('loading');
+    };
+
+    sandboxIframe.onerror = () => {
+      sandboxContent.classList.remove('loading');
+    };
+
+    // Re-initialize feather icons in the modal
+    if (typeof initFeatherIcons === 'function') {
+      setTimeout(initFeatherIcons, 100);
+    }
+  }
+});
+
+// Close sandbox viewer
+document.getElementById('sandbox-close').addEventListener('click', () => {
+  sandboxModal.classList.remove('show');
+  sandboxIframe.src = 'about:blank'; // Clear iframe
+});
+
+// Close on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && sandboxModal.classList.contains('show')) {
+    sandboxModal.classList.remove('show');
+    sandboxIframe.src = 'about:blank';
+  }
+});
+
 // Log blocked page view
 console.log('[PhishBlock] Blocked page loaded:', {
   url: blockedUrl,
@@ -140,4 +200,3 @@ console.log('[PhishBlock] Blocked page loaded:', {
   confidence: confidence,
   riskLevel: riskLevel
 });
-

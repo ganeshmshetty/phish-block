@@ -41,6 +41,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadRecentActivity();
     setupNavigation();
     setupEventListeners();
+
+    // Auto-refresh stats every 3 seconds
+    setInterval(async () => {
+        await loadStats();
+    }, 3000);
+
+    // Refresh when history changes (immediate update on block)
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName === 'local' && changes.blockedHistory) {
+            loadStats();
+            loadRecentActivity();
+        }
+    });
 });
 
 // Load data

@@ -11,14 +11,14 @@
 <body>
   <div class="container">
     <div class="shield-icon">
-      <img src="../icons/glass.png" alt="PhishBlock" width="100" height="100">
+      <img src="../icons/shield.png" alt="PhishBlock" width="100" height="100">
     </div>
 
     <h1>Phishing Site Blocked</h1>
 
     <div class="alert-box">
       <div class="alert-icon">
-        <img src="../icons/shield.png" alt="Protected" width="32" height="32">
+        <span data-feather="alert-octagon" data-size="32"></span>
       </div>
       <div class="alert-content">
         <h2>This website has been identified as a phishing attempt</h2>
@@ -28,25 +28,40 @@
     </div>
 
     <div class="details-card">
-      <h3>Blocked URL</h3>
+      <h3>
+        <span data-feather="link" data-size="20"></span>
+        Blocked URL
+      </h3>
       <div class="url-display" id="blocked-url">Loading...</div>
 
       <div class="stats-grid">
         <div class="stat-item">
-          <span class="stat-label">Risk Level</span>
-          <span class="stat-value risk-level" id="risk-level">-</span>
+          <span data-feather="alert-triangle" data-size="18"></span>
+          <div>
+            <span class="stat-label">Risk Level</span>
+            <span class="stat-value risk-level" id="risk-level">-</span>
+          </div>
         </div>
         <div class="stat-item">
-          <span class="stat-label">Confidence</span>
-          <span class="stat-value" id="confidence">-</span>
+          <span data-feather="activity" data-size="18"></span>
+          <div>
+            <span class="stat-label">Confidence</span>
+            <span class="stat-value" id="confidence">-</span>
+          </div>
         </div>
         <div class="stat-item">
-          <span class="stat-label">Domain</span>
-          <span class="stat-value" id="domain">-</span>
+          <span data-feather="globe" data-size="18"></span>
+          <div>
+            <span class="stat-label">Domain</span>
+            <span class="stat-value" id="domain">-</span>
+          </div>
         </div>
       </div>
 
-      <button class="explain-btn" id="explain-btn">Explain Why This Was Blocked</button>
+      <button class="explain-btn" id="explain-btn">
+        <span data-feather="help-circle" data-size="16"></span>
+        Explain Why This Was Blocked
+      </button>
       <div class="reasoning-section" id="reasoning-section">
         <div class="reasoning-label">Analysis Reasoning:</div>
         <div class="reasoning-text" id="reasoning-text">Loading...</div>
@@ -57,39 +72,80 @@
 
     <div class="actions">
       <button class="btn btn-primary" id="go-home">
+        <span data-feather="home" data-size="18"></span>
         Go to Homepage
       </button>
     </div>
 
     <div class="advanced-section">
       <button class="advanced-toggle" id="advanced-toggle">
+        <span data-feather="chevron-down" data-size="16"></span>
         Advanced Options
       </button>
       <div class="advanced-content" id="advanced-content">
         <p class="warning-text">
+          <span data-feather="alert-triangle" data-size="18"></span>
           <strong>Warning:</strong> Proceeding to this site may put your personal information at risk.
           Only continue if you are absolutely certain this is a false positive.
         </p>
         <div class="advanced-actions">
+          <button class="btn btn-sandbox" id="view-sandbox">
+            <span data-feather="eye" data-size="16"></span>
+            View in Sandbox
+          </button>
           <button class="btn btn-danger" id="proceed-anyway">
+            <span data-feather="arrow-right" data-size="16"></span>
             Proceed Anyway (Not Recommended)
           </button>
           <button class="btn btn-outline" id="whitelist-domain">
+            <span data-feather="check-circle" data-size="16"></span>
             Add to Whitelist
           </button>
           <button class="btn btn-outline" id="report-false-positive">
+            <span data-feather="flag" data-size="16"></span>
             Report False Positive
           </button>
         </div>
       </div>
     </div>
 
+    <!-- Sandbox Modal -->
+    <div class="sandbox-modal" id="sandbox-modal">
+      <div class="sandbox-modal-content">
+        <div class="sandbox-header">
+          <div class="sandbox-title">
+            <span data-feather="shield" data-size="20"></span>
+            <span>Sandboxed Preview</span>
+          </div>
+          <div class="sandbox-warning">
+            <span data-feather="alert-triangle" data-size="14"></span>
+            Forms and navigation are restricted
+          </div>
+          <button class="sandbox-close" id="sandbox-close">
+            <span data-feather="x" data-size="20"></span>
+          </button>
+        </div>
+        <div class="sandbox-content">
+          <iframe 
+            id="sandbox-iframe" 
+            sandbox="allow-scripts allow-same-origin"
+            referrerpolicy="no-referrer"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
     <footer>
       <p>Protected by <strong>PhishBlock</strong> - Real-time Phishing Detection</p>
-      <p class="footer-sub">Powered by Machine Learning</p>
+      <p class="footer-sub">
+        <span data-feather="cpu" data-size="14"></span>
+        Powered by Machine Learning
+      </p>
     </footer>
   </div>
 
+  <script src="../icons/feather-loader.js"></script>
   <script src="blocked.js"></script>
 </body>
 

@@ -614,3 +614,43 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
 }
+
+/* Feather Icons Styling */
+[data-feather] {
+    display: inline-block;
+    vertical-align: middle;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.nav-btn [data-feather] {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+button [data-feather],
+.btn [data-feather] {
+    margin-right: 6px;
+}
+
+.setting-label [data-feather] {
+    margin-right: 6px;
+    vertical-align: text-bottom;
+}
+
+.model-row [data-feather] {
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+h3 [data-feather] {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.stat-icon [data-feather] {
+    stroke-width: 2.5;
+}

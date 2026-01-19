@@ -28,28 +28,53 @@
     <section class="current-site" id="current-site-section">
       <div class="site-header">
         <span class="site-label">Current Site</span>
-        <button class="refresh-btn" id="refresh-analysis" title="Re-analyze">Refresh</button>
+        <button class="refresh-btn" id="refresh-analysis" title="Re-analyze">
+          <span data-feather="refresh-cw" data-size="14"></span>
+          Refresh
+        </button>
       </div>
-      <div class="site-info">
-        <div class="site-domain" id="current-domain">Loading...</div>
-        <div class="site-status" id="site-status">
-          <img src="../icons/check.png" alt="Safe" class="status-icon" id="status-icon-safe"
-            style="display: none; width: 16px; height: 16px;">
-          <span class="status-indicator" id="status-indicator"></span>
-          <span class="status-text" id="status-text">Analyzing...</span>
+
+      <div class="threat-meter-container">
+        <!-- Threat Meter Gauge -->
+        <div class="threat-meter" id="threat-meter">
+          <svg viewBox="0 0 100 60" class="meter-svg">
+            <!-- Background arc -->
+            <path class="meter-bg" d="M 10 55 A 40 40 0 0 1 90 55" />
+            <!-- Colored arc (threat level) -->
+            <path class="meter-fill" id="meter-fill" d="M 10 55 A 40 40 0 0 1 90 55" />
+            <!-- Needle -->
+            <line class="meter-needle" id="meter-needle" x1="50" y1="55" x2="50" y2="20" />
+            <circle class="meter-center" cx="50" cy="55" r="4" />
+          </svg>
+          <div class="meter-labels">
+            <span class="meter-label safe">Safe</span>
+            <span class="meter-label danger">Risk</span>
+          </div>
+        </div>
+
+        <!-- Status Info -->
+        <div class="site-info-compact">
+          <div class="site-domain" id="current-domain">Loading...</div>
+          <div class="site-status" id="site-status">
+            <span class="status-indicator" id="status-indicator"></span>
+            <span class="status-text" id="status-text">Analyzing...</span>
+          </div>
+          <div class="confidence-display" id="confidence-display">
+            <span class="confidence-value" id="confidence">-</span>
+            <span class="confidence-label">confidence</span>
+          </div>
         </div>
       </div>
-      <div class="analysis-details" id="analysis-details">
-        <div class="detail-row">
-          <span class="detail-label">Risk Level</span>
-          <span class="detail-value" id="risk-level">-</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Confidence</span>
-          <span class="detail-value" id="confidence">-</span>
-        </div>
-      </div>
-      <button class="explain-btn" id="explain-btn" style="display: none;">Explain Analysis</button>
+
+      <!-- Hidden elements for compatibility -->
+      <img src="../icons/check.png" alt="Safe" class="status-icon" id="status-icon-safe"
+        style="display: none; width: 16px; height: 16px;">
+      <span id="risk-level" style="display: none;">-</span>
+
+      <button class="explain-btn" id="explain-btn" style="display: none;">
+        <span data-feather="info" data-size="14"></span>
+        Explain Analysis
+      </button>
       <div class="reasoning-section" id="reasoning-section" style="display: none;">
         <div class="reasoning-label">Analysis Reasoning:</div>
         <div class="reasoning-text" id="reasoning-text">Loading...</div>
@@ -59,28 +84,32 @@
     <!-- Quick Stats -->
     <section class="stats-section">
       <div class="stat-card">
-        <span class="stat-number" id="stat-analyzed">0</span>
-        <span class="stat-label">Analyzed</span>
+        <span class="stat-icon" data-feather="activity" data-size="16"></span>
+        <div>
+          <span class="stat-number" id="stat-analyzed">0</span>
+          <span class="stat-label">Analyzed</span>
+        </div>
       </div>
       <div class="stat-card blocked">
-        <span class="stat-number" id="stat-blocked">0</span>
-        <span class="stat-label">Blocked</span>
+        <span class="stat-icon" data-feather="shield-off" data-size="16"></span>
+        <div>
+          <span class="stat-number" id="stat-blocked">0</span>
+          <span class="stat-label">Blocked</span>
+        </div>
       </div>
       <div class="stat-card warning">
-        <span class="stat-number" id="stat-warnings">0</span>
-        <span class="stat-label">Warnings</span>
+        <span class="stat-icon" data-feather="alert-triangle" data-size="16"></span>
+        <div>
+          <span class="stat-number" id="stat-warnings">0</span>
+          <span class="stat-label">Warnings</span>
+        </div>
       </div>
     </section>
 
     <!-- Open Dashboard Button -->
     <section class="dashboard-link">
       <button class="dashboard-btn" id="open-dashboard">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" />
-          <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" />
-          <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" />
-          <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" />
-        </svg>
+        <span data-feather="grid" data-size="16"></span>
         Open Full Dashboard
       </button>
     </section>
@@ -93,6 +122,7 @@
     </footer>
   </div>
 
+  <script src="../icons/feather-loader.js"></script>
   <script src="popup.js"></script>
 </body>
 

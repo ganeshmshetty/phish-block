@@ -15,7 +15,7 @@
                 <img src="../icons/glass.png" alt="PhishBlock" width="32" height="32">
                 <h1>PhishBlock Dashboard</h1>
             </div>
-            <div class="header-actions">
+            <div class="header-actions">    
                 <span class="version">v1.0.0</span>
                 <label class="toggle-switch">
                     <input type="checkbox" id="main-toggle" checked>
@@ -25,10 +25,22 @@
         </header>
 
         <nav class="sidebar">
-            <button class="nav-btn active" data-tab="overview">Overview</button>
-            <button class="nav-btn" data-tab="whitelist">Whitelist</button>
-            <button class="nav-btn" data-tab="history">History</button>
-            <button class="nav-btn" data-tab="settings">Settings</button>
+            <button class="nav-btn active" data-tab="overview">
+                <span data-feather="home" data-size="18"></span>
+                Overview
+            </button>
+            <button class="nav-btn" data-tab="whitelist">
+                <span data-feather="check-circle" data-size="18"></span>
+                Whitelist
+            </button>
+            <button class="nav-btn" data-tab="history">
+                <span data-feather="clock" data-size="18"></span>
+                History
+            </button>
+            <button class="nav-btn" data-tab="settings">
+                <span data-feather="settings" data-size="18"></span>
+                Settings
+            </button>
         </nav>
 
         <main class="content">
@@ -39,11 +51,7 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="10" stroke="#22c55e" stroke-width="2" />
-                                <path d="M8 12l2 2 4-4" stroke="#22c55e" stroke-width="2" stroke-linecap="round" />
-                            </svg>
+                            <span data-feather="activity" data-size="24"></span>
                         </div>
                         <div class="stat-info">
                             <div class="stat-value" id="total-analyzed">0</div>
@@ -53,11 +61,7 @@
 
                     <div class="stat-card">
                         <div class="stat-icon danger">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="10" stroke="#ef4444" stroke-width="2" />
-                                <path d="M12 8v4M12 16h.01" stroke="#ef4444" stroke-width="2" stroke-linecap="round" />
-                            </svg>
+                            <span data-feather="shield-off" data-size="24"></span>
                         </div>
                         <div class="stat-info">
                             <div class="stat-value danger" id="threats-blocked">0</div>
@@ -67,11 +71,7 @@
 
                     <div class="stat-card">
                         <div class="stat-icon warning">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L1 21h22L12 2z" stroke="#f59e0b" stroke-width="2" />
-                                <path d="M12 9v4M12 17h.01" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" />
-                            </svg>
+                            <span data-feather="alert-triangle" data-size="24"></span>
                         </div>
                         <div class="stat-info">
                             <div class="stat-value warning" id="warnings-shown">0</div>
@@ -81,11 +81,7 @@
 
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="#6b7280" stroke-width="2" />
-                                <path d="M3 9h18M9 3v18" stroke="#6b7280" stroke-width="2" />
-                            </svg>
+                            <span data-feather="database" data-size="24"></span>
                         </div>
                         <div class="stat-info">
                             <div class="stat-value" id="cache-size">0</div>
@@ -95,31 +91,31 @@
                 </div>
 
                 <div class="section">
-                    <h3>Model Information</h3>
-                    <div class="model-card">
-                        <div class="model-row">
-                            <span>Extension Version</span>
-                            <span>v1.0.0</span>
-                        </div>
-                        <div class="model-row">
-                            <span>API Endpoint</span>
-                            <span id="model-endpoint">Detecting...</span>
-                        </div>
-                        <div class="model-row">
-                            <span>Model Version</span>
-                            <span id="model-version">v1.0.0</span>
-                        </div>
-                        <div class="model-row">
-                            <span>Status</span>
-                            <span id="model-status">Loading...</span>
-                        </div>
+                    <h3>Recent Activity</h3>
+                    <div class="activity-list" id="recent-activity">
+                        <div class="activity-empty">No recent activity</div>
                     </div>
                 </div>
 
                 <div class="section">
-                    <h3>Recent Activity</h3>
-                    <div class="activity-list" id="recent-activity">
-                        <div class="activity-empty">No recent activity</div>
+                    <h3>Model Information</h3>
+                    <div class="model-card">
+                        <div class="model-row">
+                            <span><span data-feather="package" data-size="16"></span> Extension Version</span>
+                            <span>v1.0.0</span>
+                        </div>
+                        <div class="model-row">
+                            <span><span data-feather="server" data-size="16"></span> API Endpoint</span>
+                            <span id="model-endpoint">Detecting...</span>
+                        </div>
+                        <div class="model-row">
+                            <span><span data-feather="cpu" data-size="16"></span> Model Version</span>
+                            <span id="model-version">v1.0.0</span>
+                        </div>
+                        <div class="model-row">
+                            <span><span data-feather="zap" data-size="16"></span> Status</span>
+                            <span id="model-status">Loading...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -135,7 +131,10 @@
 
                     <div class="input-group inline">
                         <input type="text" id="whitelist-input" placeholder="Enter domain (e.g., example.com)">
-                        <button class="btn btn-primary" id="add-whitelist">Add Domain</button>
+                        <button class="btn btn-primary" id="add-whitelist">
+                            <span data-feather="plus" data-size="16"></span>
+                            Add Domain
+                        </button>
                     </div>
 
                     <div class="whitelist-table">
@@ -158,7 +157,10 @@
                 <div class="section">
                     <div class="section-header">
                         <p>Recently blocked phishing attempts and suspicious sites.</p>
-                        <button class="btn btn-secondary" id="clear-history">Clear All</button>
+                        <button class="btn btn-secondary" id="clear-history">
+                            <span data-feather="trash-2" data-size="16"></span>
+                            Clear All
+                        </button>
                     </div>
 
                     <div class="history-table">
@@ -184,7 +186,10 @@
                     <div class="settings-list">
                         <div class="setting-item">
                             <div class="setting-info">
-                                <div class="setting-label">Auto-Block Phishing Sites</div>
+                                <div class="setting-label">
+                                    <span data-feather="shield" data-size="16"></span>
+                                    Auto-Block Phishing Sites
+                                </div>
                                 <div class="setting-desc">Automatically block detected phishing websites</div>
                             </div>
                             <label class="toggle-switch">
@@ -195,7 +200,10 @@
 
                         <div class="setting-item">
                             <div class="setting-info">
-                                <div class="setting-label">Strict Mode</div>
+                                <div class="setting-label">
+                                    <span data-feather="alert-octagon" data-size="16"></span>
+                                    Strict Mode
+                                </div>
                                 <div class="setting-desc">Use lower detection threshold (more aggressive)</div>
                             </div>
                             <label class="toggle-switch">
@@ -206,7 +214,10 @@
 
                         <div class="setting-item">
                             <div class="setting-info">
-                                <div class="setting-label">Developer Mode</div>
+                                <div class="setting-label">
+                                    <span data-feather="code" data-size="16"></span>
+                                    Developer Mode
+                                </div>
                                 <div class="setting-desc">Use local API (localhost:8000) for testing</div>
                             </div>
                             <label class="toggle-switch">
@@ -220,9 +231,18 @@
                 <div class="section">
                     <h3>Data Management</h3>
                     <div class="button-group">
-                        <button class="btn btn-secondary" id="clear-cache">Clear Cache</button>
-                        <button class="btn btn-secondary" id="export-data">Export Data</button>
-                        <button class="btn btn-danger" id="reset-settings">Reset All Settings</button>
+                        <button class="btn btn-secondary" id="clear-cache">
+                            <span data-feather="database" data-size="16"></span>
+                            Clear Cache
+                        </button>
+                        <button class="btn btn-secondary" id="export-data">
+                            <span data-feather="download" data-size="16"></span>
+                            Export Data
+                        </button>
+                        <button class="btn btn-danger" id="reset-settings">
+                            <span data-feather="refresh-ccw" data-size="16"></span>
+                            Reset All Settings
+                        </button>
                     </div>
                 </div>
 
@@ -238,6 +258,7 @@
         </main>
     </div>
 
+    <script src="../icons/feather-loader.js"></script>
     <script src="dashboard.js"></script>
 </body>
 
