@@ -81,12 +81,24 @@ function getApiUrl() {
 function shouldSkipUrl(url) {
   if (!url) return true;
 
-  // Check if temporarily allowed (one-time bypass)
+  // Check if temporarily allowed (bypass blocking for 30 seconds)
   if (temporarilyAllowedUrls.has(url)) {
-    temporarilyAllowedUrls.delete(url); // Remove after use (one-time only)
-    console.log('[PhishBlock] Temporarily allowed URL:', url);
+    console.log('[PhishBlock] Temporarily allowed URL (exact match):', url);
     return true;
   }
+
+  // Also check by origin to handle URL variations (query params, fragments, etc.)
+  try {
+    const urlOrigin = new URL(url).origin;
+    for (const allowedUrl of temporarilyAllowedUrls) {
+      try {
+        if (new URL(allowedUrl).origin === urlOrigin) {
+          console.log('[PhishBlock] Temporarily allowed URL (origin match):', url);
+          return true;
+        }
+      } catch { /* ignore invalid URLs in set */ }
+    }
+  } catch { /* ignore URL parse errors */ }
 
   // Skip browser internal pages
   const skipPatterns = [
@@ -380,9 +392,14 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 
   if (result.is_phishing && settings.autoBlock) {
     blockPage(details.tabId, details.url, result);
-  } else if (result.confidence >= CONFIG.THRESHOLDS.WARN && !result.is_phishing) {
-    // Show warning for suspicious but not blocked URLs
-    setTimeout(() => showWarning(details.tabId, details.url, result), 1000);
+  } else if (!result.is_phishing && result.risk_level &&
+    (result.risk_level.toLowerCase() === 'medium' || result.risk_level.toLowerCase() === 'high')) {
+    // Show warning only for suspicious sites (medium/high risk) that aren't blocked
+    // Never show warning for 'safe' or 'low' risk levels
+    const riskLower = result.risk_level.toLowerCase();
+    if (riskLower !== 'safe' && riskLower !== 'low') {
+      setTimeout(() => showWarning(details.tabId, details.url, result), 1000);
+    }
   }
 });
 
